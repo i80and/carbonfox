@@ -1,0 +1,151 @@
+<!doctype html>
+<html >
+    <head>
+        <title>Foxy Authentication</title>
+        <meta charset='utf-8'>
+        <meta name='viewport' content='width=device-width, user-scalable=no, initial-scale=1'>
+
+        <link href='style/fonts.css' rel='stylesheet' type='text/css'>
+        <link href='style/util.css' rel='stylesheet' type='text/css'>
+        <link href='style/style/headers.css' rel='stylesheet' type='text/css'>
+        <link href='style/style/buttons.css' rel='stylesheet' type='text/css'>
+        <link href='style/style/input_areas.css' rel='stylesheet' type='text/css'>
+        <link href='style/style/toolbars.css' rel='stylesheet' type='text/css'>
+        <link href='style/style/lists.css' rel='stylesheet' type='text/css'>
+        <link href='style/style/scrolling.css' rel='stylesheet' type='text/css'>
+        <link href='style/icons/styles/action_icons.css' rel='stylesheet' type='text/css'>
+
+        <link rel='stylesheet' href='main.css' type='text/css'>
+    </head>
+    <body>
+        <section class='slide-vertical' role='region' id='lock-pane'>
+            <input type='password' id='lock-pane-input'>
+            <x-keypad></x-keypad>
+            <table>
+                <tr>
+                    <td><button>1</button></td>
+                    <td><button><div>2</div><div>abc</div></button></td>
+                    <td><button><div>3</div><div>def</div></button></td>
+                </tr>
+                <tr>
+                    <td><button><div>4</div><div>ghi</div></button></td>
+                    <td><button><div>5</div><div>jkl</div></button></td>
+                    <td><button><div>6</div><div>mno</div></button></td>
+                </tr>
+                <tr>
+                    <td><button><div>7</div><div>pqr</div></button></td>
+                    <td><button><div>8</div><div>tuv</div></button></td>
+                    <td><button><div>9</div><div>wxyz</div></button></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><button>0</button></td>
+                    <td></td>
+                </tr>
+            </table>
+        </section>
+
+        <section class='scrollable' role='region' id='main-body'>
+            <header>
+                <button class='action-icon search'></button>
+                <menu type='toolbar'>
+                    <a href='#'><span class='icon icon-add' id='add-identity'>new</span></a>
+                </menu>
+                <h1>Foxy Authenticate</h1>
+            </header>
+
+            <section data-type='list'>
+                <ul id='token-list'></ul>
+            </section>
+        </section>
+
+        <section class='scrollable slide-vertical' role='region' id='pane-add-what'>
+            <header>
+                <a href='#'><span class='icon icon-close' id='close-add-what'>close</span></a>
+                <h1>Add Identity</h1>
+            </header>
+
+            <section data-type='list'>
+                <h2>Timed Code</h2>
+                <ul>
+                    <li><button id='scan-qr-input'>Scan QR Code</button></li>
+                    <li><button id='add-manual-totp-input'>Manually Add</button></li>
+                </ul>
+
+                <h2>Password</h2>
+                <ul>
+                    <li><button id='add-manual-password-input'>Manually Add</button></li>
+                </ul>
+            </section>
+        </section>
+
+        <section class='scrollable slide-vertical' role='region' id='pane-add-manual-totp'>
+            <header>
+                <a href='#'><span class='icon icon-back' id='close-manual-totp-input'>close</span></a>
+                <menu type='toolbar'>
+                    <button class='icon icon-edit' id='save-identity-input'>save</button>
+                </menu>
+                <h1>Manually Add</h1>
+            </header>
+            <fieldset>
+                <section>
+                    <h2>Identity Name</h2>
+                    <input type='text' required id='identity-input'>
+                </section>
+                <section>
+                    <h2>Secret (base32)</h2>
+                    <input type='text' placeholder='KNSWG4TFOQ======' required id='secret-input' name='secret-input'>
+                </section>
+                <section>
+                    <h2>Hash Function</h2>
+                    <select name='hash-type-input' id='hash-type-input'>
+                        <option value='sha1'>SHA-1</option>
+                        <option value='sha256'>SHA-256</option>
+                        <option value='sha512'>SHA-512</option>
+                    </select>
+                </section>
+                <section>
+                    <h2>Interval</h2>
+                    <input type='number' value='30' id='interval-input'>
+                </section>
+                <section>
+                    <h2>Digits</h2>
+                    <input type='number' value='6' id='digits-input'>
+                </section>
+            </fieldset>
+        </section>
+
+        <section class='scrollable slide-vertical' role='region' id='pane-add-password'>
+            <header>
+                <a href='#'><span class='icon icon-back' id='close-manual-password-input'>close</span></a>
+                <menu type='toolbar'>
+                    <button class='icon icon-edit'>save</button>
+                </menu>
+                <h1>Add Password</h1>
+            </header>
+            <fieldset>
+                <section>
+                    <h2>Website</h2>
+                    <input type='text' required>
+                </section>
+                <section>
+                    <h2>Username</h2>
+                    <input type='text' required>
+                </section>
+                <section>
+                    <h2>Password</h2>
+                    <input type='password'>
+                </section>
+            </fieldset>
+        </section>
+
+        <div role="toolbar" style="display:none" id="toolbar">
+            <ul>
+                <li><button class="action-icon delete">delete</button></li>
+            </ul>
+            <ul></ul>
+        </div>
+
+        <script type='text/javascript' src='js/bundle.min.js'></script>
+    </body>
+</html>

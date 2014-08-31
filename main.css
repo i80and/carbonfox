@@ -1,0 +1,59 @@
+.slide-vertical {
+    width: 100%;
+    position: fixed;
+    top: 100%;
+    transition: top 0.4s ease;
+}
+
+#token-list li p:only-of-type {
+    font-size: 3rem;
+}
+
+fieldset {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+#pane-add-manual-totp {
+    z-index: 200;
+}
+
+#pane-add-what {
+    z-index: 100;
+}
+
+#lock-pane {
+    height: 100%;
+    z-index: 900;
+    top: 0%;
+}
+
+#lock-pane-input {
+
+}
+
+#lock-pane table {
+    padding: 4rem;
+    height: 90%;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#lock-pane table tr {
+    height: 25%;
+    width: 33.333%;
+}
+
+#lock-pane table tr td button {
+    height: 100%;
+    width: 100%;
+}
+
+#pane-add-password {
+    z-index: 300;
+}
+
+#toolbar {
+    bottom: -4rem;
+}

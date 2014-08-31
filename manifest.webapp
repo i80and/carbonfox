@@ -1,0 +1,8 @@
+{
+  "name": "Foxy Authentication",
+  "launch_path": "/index.html",
+  "developer": {
+    "name": "Andrew Aldridge <i80and@foxquill.com>"
+  },
+  "default_locale": "en"
+}

@@ -1,0 +1,11 @@
+{
+    "name": "foxy-authentication",
+    "version": "0.0.0",
+    "author": "Andrew Aldridge <i80and@foxquill.com>",
+    "dependencies": {
+        "browserify": ">= 5.11.0",
+        "uglify-js": ">= 2.4.15",
+        "jshint": ">= 2.5.5"
+    },
+    "private": true
+}
