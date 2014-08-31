@@ -5,7 +5,7 @@ JSQRCODE_SRC=src/deps/jsqrcode/src/grid.js src/deps/jsqrcode/src/version.js src/
 
 all: $(TARGETS)
 
-js/bundle.min.js: $(JSQRCODE_SRC) js/bundle.js
+js/bundle.min.js: js/bundle.js
 	./node_modules/.bin/uglifyjs $^ --screw-ie8 -c "warnings=false" -b -o $@
 
 js/bundle.js: src/*.js
