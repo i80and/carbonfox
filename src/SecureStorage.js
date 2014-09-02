@@ -4,8 +4,9 @@ var Sjcl = require('./deps/sjcl.js')
 
 // SJCL's convenience cryptographic methods are fine, but a little weaker than we would like; AES-128
 // with 1000 rounds of PBKDF2.  We choose 5000 rounds for now (but perhaps should switch to scrypt)
-// along with AES-192.  AES-256 is extra-vulnerable to related key attacks.
-var KEY_SIZE = 192
+// along with AES-256; our usage of AES should not be vulnerable to a related-key attack.  Still,
+// I'd prefer to use salsa20 or something instead.
+var KEY_SIZE = 256
 var ITERS = 5000
 
 // Return a promise for a possibly-asynchronously-computed encrypted value.  In practice, right now
