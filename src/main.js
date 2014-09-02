@@ -4,30 +4,10 @@ var TotpManager = require('./TotpManager.js')
 var Totp = require('./Totp.js')
 var Base32 = require('./Base32.js')
 var Toolbar = require('./Toolbar.js')
+var SecureStorage = require('./SecureStorage.js')
+var SlidePane = require('./SlidePane.js')
+var LoginPane = require('./LoginPane.js')
 var Sjcl = require('./deps/sjcl.js')
-
-var SlidePane = function(element) {
-    this.element = element
-    this.close()
-}
-
-SlidePane.prototype.open = function() {
-    if(this.state === 'open') {
-        return
-    }
-
-    this.element.style.top = '0%'
-    this.state = 'open'
-}
-
-SlidePane.prototype.close = function() {
-    if(this.state === 'closed') {
-        return
-    }
-
-    this.element.style.top = '100%'
-    this.state = 'closed'
-}
 
 window.addEventListener('load', function() {
     // If something about the environment is exposing a bug in our implementation,
@@ -42,6 +22,40 @@ window.addEventListener('load', function() {
 
     Toolbar.init()
 
+    var secureStorage = new SecureStorage.SecureStorage('carbonfox')
+
+    var loginPane = new LoginPane.LoginPane()
+    if(!secureStorage.isInitialized()) {
+        loginPane.setupMode = true
+    }
+
+    loginPane.onentry = function(pin) {
+        secureStorage.unlock(pin).then(function() {
+            console.log('OK!')
+            loginPane.slidePane.close()
+        }).catch(function(err) {
+            console.error(err)
+            loginPane.clear()
+        })
+    }
+
+    loginPane.onsetup = function(pin) {
+        // Make SURE we're not overwriting anything
+        if(secureStorage.isInitialized()) {
+            throw 'Setting up again!'
+        }
+
+        secureStorage.setup(pin).then(function() {
+            secureStorage.setupMode = false
+            loginPane.slidePane.close()
+        }).catch(function(err) {
+            console.error(err)
+        })
+    }
+
+    loginPane.slidePane.open()
+    loginPane.refresh()
+
     var manager = new TotpManager.TotpManager(document.getElementById('token-list'))
     manager.add(new Totp.Totp('i80and@gmail.com', Sjcl.codec.utf8String.toBits('foobar'), 30))
     for(var i = 0; i < 100; i += 1) {
@@ -49,10 +63,10 @@ window.addEventListener('load', function() {
     }
 
     var addWhatPane = {}
-    addWhatPane.slidePane = new SlidePane(document.getElementById('pane-add-what'))
+    addWhatPane.slidePane = new SlidePane.SlidePane(document.getElementById('pane-add-what'))
 
     var manualTotpPane = {}
-    manualTotpPane.slidePane = new SlidePane(document.getElementById('pane-add-manual-totp'))
+    manualTotpPane.slidePane = new SlidePane.SlidePane(document.getElementById('pane-add-manual-totp'))
     manualTotpPane.identityInput = document.getElementById('identity-input')
     manualTotpPane.secretKeyInput = document.getElementById('secret-input')
     manualTotpPane.hashFunctionInput = document.getElementById('hash-type-input')
@@ -88,7 +102,7 @@ window.addEventListener('load', function() {
     }
 
     var addPasswordPane = {}
-    addPasswordPane.slidePane = new SlidePane(document.getElementById('pane-add-password'))
+    addPasswordPane.slidePane = new SlidePane.SlidePane(document.getElementById('pane-add-password'))
 
     document.getElementById('add-identity').onclick = function() {
         addWhatPane.slidePane.open()

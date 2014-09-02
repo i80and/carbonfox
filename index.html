@@ -19,30 +19,15 @@
     </head>
     <body>
         <section class='slide-vertical' role='region' id='lock-pane'>
-            <input type='password' id='lock-pane-input'>
-            <x-keypad></x-keypad>
-            <table>
-                <tr>
-                    <td><button>1</button></td>
-                    <td><button><div>2</div><div>abc</div></button></td>
-                    <td><button><div>3</div><div>def</div></button></td>
-                </tr>
-                <tr>
-                    <td><button><div>4</div><div>ghi</div></button></td>
-                    <td><button><div>5</div><div>jkl</div></button></td>
-                    <td><button><div>6</div><div>mno</div></button></td>
-                </tr>
-                <tr>
-                    <td><button><div>7</div><div>pqr</div></button></td>
-                    <td><button><div>8</div><div>tuv</div></button></td>
-                    <td><button><div>9</div><div>wxyz</div></button></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td><button>0</button></td>
-                    <td></td>
-                </tr>
-            </table>
+            <header>
+                <h1>Unlock</h1>
+            </header>
+
+            <section>
+                <h2 id='lock-pane-prompt'>Please enter your unlock code</h2>
+                <div id='lock-pane-display'></div>
+            </section>
+            <x-keypad id="lock-pane-input"></x-keypad>
         </section>
 
         <section class='scrollable' role='region' id='main-body'>
@@ -145,6 +130,32 @@
             </ul>
             <ul></ul>
         </div>
+
+        <template id="template-keypad">
+            <section>
+                <a href='#' data-value='1'><div>1</div><div>&nbsp;</div></a>
+                <a href='#' data-value='2'><div>2</div><div>abc</div></a>
+                <a href='#' data-value='3'><div>3</div><div>def</div></a>
+            </section>
+
+            <section>
+                <a href='#' data-value='4'><div>4</div><div>ghi</div></a>
+                <a href='#' data-value='5'><div>5</div><div>jkl</div></a>
+                <a href='#' data-value='6'><div>6</div><div>mno</div></a>
+            </section>
+
+            <section>
+                <a href='#' data-value='7'><div>7</div><div>pqr</div></a>
+                <a href='#' data-value='8'><div>8</div><div>tuv</div></a>
+                <a href='#' data-value='9'><div>9</div><div>wxyz</div></a>
+            </section>
+
+            <section>
+                <a></a>
+                <a href='#' data-value='0'><div>0</div><div>&nbsp;</div></a>
+                <a href='#' data-value='backspace'>Bkspace</a>
+            </section>
+        </template>
 
         <script type='text/javascript' src='js/bundle.min.js'></script>
     </body>
