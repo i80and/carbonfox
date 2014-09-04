@@ -56,11 +56,13 @@ window.addEventListener('load', function() {
     loginPane.slidePane.open()
     loginPane.refresh()
 
-    var manager = new TotpManager.TotpManager(document.getElementById('token-list'))
+    var manager = new TotpManager.TotpManager()
+    var display = new TotpManager.TotpManagerDisplay(document.getElementById('token-list'), manager)
     manager.add(new Totp.Totp('i80and@gmail.com', Sjcl.codec.utf8String.toBits('foobar'), 30))
     for(var i = 0; i < 100; i += 1) {
         manager.add(new Totp.Totp(i.toString(), Sjcl.codec.utf8String.toBits('foobar' + i.toString()), 30))
     }
+    display.refresh()
 
     var addWhatPane = {}
     addWhatPane.slidePane = new SlidePane.SlidePane(document.getElementById('pane-add-what'))

@@ -86,12 +86,13 @@ TotpDisplay.prototype.toggle = function() {
     this.refresh()
 }
 
-var TotpManager = function(element) {
-    this.rootElement = element
-
+var TotpManager = function() {
     this.identities = {}
-    this.elements = {}
     this.timers = {}
+
+    this.onupdate = function() {}
+    this.onadd = function() {}
+    this.onremove = function() {}
 }
 
 TotpManager.prototype.add = function(totp) {
@@ -102,9 +103,7 @@ TotpManager.prototype.add = function(totp) {
     }
 
     var tick = function() {
-        for(var identityNeedingRefresh in _this.timers[totp.interval]) {
-            _this.refresh(_this.identities[identityNeedingRefresh])
-        }
+        _this.onupdate(_this.timers[totp.interval])
     }
 
     this.identities[totp.identity] = totp
@@ -123,20 +122,44 @@ TotpManager.prototype.add = function(totp) {
     }
 
     this.timers[totp.interval][totp.identity] = null
-    this.elements[totp.identity] = new TotpDisplay(this.rootElement, totp)
-    this.refresh()
-}
-
-TotpManager.prototype.refresh = function() {
-    for(var identity in this.elements) {
-        this.elements[identity].refresh()
-    }
+    this.onadd(totp)
 }
 
 TotpManager.prototype.remove = function(totp) {
     delete this.identities[totp.identity]
-    delete this.elements[totp.identity]
     delete this.timers[totp.interval][totp.identity]
+    this.onremove(totp.identity)
+}
+
+var TotpManagerDisplay = function(element, manager) {
+    var _this = this
+
+    this.rootElement = element
+    this.elements = {}
+    this.manager = manager
+
+    manager.onupdate = function(identities) {
+        _this.refresh(identities)
+    }
+
+    manager.onadd = function(totp) {
+        _this.elements[totp.identity] = new TotpDisplay(_this.rootElement, totp)
+    }
+
+    manager.onremove = function(identity) {
+        delete _this.elements[identity]
+    }
+}
+
+TotpManagerDisplay.prototype.refresh = function(dirtyIdentities) {
+    if(dirtyIdentities === undefined) {
+        dirtyIdentities = this.manager.identities
+    }
+
+    for(var identity in dirtyIdentities) {
+        this.elements[identity].refresh()
+    }
 }
 
 exports.TotpManager = TotpManager
+exports.TotpManagerDisplay = TotpManagerDisplay
