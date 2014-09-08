@@ -2,10 +2,12 @@
 
 var Toolbar = require('./Toolbar.js')
 
-var TotpDisplay = function(parent, totp) {
+var TokenDisplay = function(parent, token) {
     var _this = this
 
-    this.totp = totp
+    this.token = token
+    this.key = ''
+
     this.rootElement = document.createElement('li')
     this.mainDisplay = document.createElement('p')
     this.secondaryDisplay = document.createElement('p')
@@ -16,7 +18,6 @@ var TotpDisplay = function(parent, totp) {
     this.rootElement.appendChild(this.secondaryDisplay)
 
     this.timerDisplay.className = 'pack-end'
-    this.secondaryDisplay.style.transition = 'opacity ' + totp.interval + 's linear'
 
     this.toolbar = document.getElementById('toolbar')
 
@@ -39,23 +40,21 @@ var TotpDisplay = function(parent, totp) {
     parent.appendChild(this.rootElement)
 }
 
-TotpDisplay.prototype.refresh = function(key) {
-    if(key === undefined) {
-        key = this.totp.getKey()
+TokenDisplay.prototype.refresh = function(key) {
+    if(key !== undefined) {
+        this.key = key
     }
 
     if(this.shown) {
-        this.mainDisplay.textContent = key
-        this.secondaryDisplay.textContent = this.totp.identity
+        this.mainDisplay.textContent = this.key
+        this.secondaryDisplay.textContent = this.token.identity
     } else {
-        this.mainDisplay.textContent = this.totp.identity
-        this.secondaryDisplay.textContent = key
+        this.mainDisplay.textContent = this.token.identity
+        this.secondaryDisplay.textContent = this.key
     }
-
-    this.value = key
 }
 
-TotpDisplay.prototype.hide = function() {
+TokenDisplay.prototype.hide = function() {
     if(!this.shown) {
         return
     }
@@ -65,7 +64,7 @@ TotpDisplay.prototype.hide = function() {
     this.refresh()
 }
 
-TotpDisplay.prototype.show = function() {
+TokenDisplay.prototype.show = function() {
     if(this.shown) {
         return
     }
@@ -75,7 +74,7 @@ TotpDisplay.prototype.show = function() {
     this.refresh()
 }
 
-TotpDisplay.prototype.toggle = function() {
+TokenDisplay.prototype.toggle = function() {
     if(this.shown) {
         this.hide()
     }
@@ -86,7 +85,7 @@ TotpDisplay.prototype.toggle = function() {
     this.refresh()
 }
 
-var TotpManager = function() {
+var TokenManager = function() {
     this.identities = {}
     this.timers = {}
 
@@ -95,7 +94,7 @@ var TotpManager = function() {
     this.onremove = function() {}
 }
 
-TotpManager.prototype.add = function(totp) {
+TokenManager.prototype.add = function(totp) {
     var _this = this
 
     if(totp.identity in this.identities) {
@@ -125,13 +124,17 @@ TotpManager.prototype.add = function(totp) {
     this.onadd(totp)
 }
 
-TotpManager.prototype.remove = function(totp) {
+TokenManager.prototype.remove = function(totp) {
     delete this.identities[totp.identity]
     delete this.timers[totp.interval][totp.identity]
     this.onremove(totp.identity)
 }
 
-var TotpManagerDisplay = function(element, manager) {
+TokenManager.prototype.get = function(identity) {
+    return this.identities[identity].getKey()
+}
+
+var TokenManagerDisplay = function(element, manager) {
     var _this = this
 
     this.rootElement = element
@@ -143,7 +146,7 @@ var TotpManagerDisplay = function(element, manager) {
     }
 
     manager.onadd = function(totp) {
-        _this.elements[totp.identity] = new TotpDisplay(_this.rootElement, totp)
+        _this.elements[totp.identity] = new TokenDisplay(_this.rootElement, totp)
     }
 
     manager.onremove = function(identity) {
@@ -151,15 +154,15 @@ var TotpManagerDisplay = function(element, manager) {
     }
 }
 
-TotpManagerDisplay.prototype.refresh = function(dirtyIdentities) {
+TokenManagerDisplay.prototype.refresh = function(dirtyIdentities) {
     if(dirtyIdentities === undefined) {
         dirtyIdentities = this.manager.identities
     }
 
     for(var identity in dirtyIdentities) {
-        this.elements[identity].refresh()
+        this.elements[identity].refresh(this.manager.get(identity))
     }
 }
 
-exports.TotpManager = TotpManager
-exports.TotpManagerDisplay = TotpManagerDisplay
+exports.TokenManager = TokenManager
+exports.TokenManagerDisplay = TokenManagerDisplay

@@ -1,6 +1,6 @@
 'use strict';
 
-var TotpManager = require('./TotpManager.js')
+var TokenManager = require('./TokenManager.js')
 var Totp = require('./Totp.js')
 var Base32 = require('./Base32.js')
 var Toolbar = require('./Toolbar.js')
@@ -56,8 +56,8 @@ window.addEventListener('load', function() {
     loginPane.slidePane.open()
     loginPane.refresh()
 
-    var manager = new TotpManager.TotpManager()
-    var display = new TotpManager.TotpManagerDisplay(document.getElementById('token-list'), manager)
+    var manager = new TokenManager.TokenManager()
+    var display = new TokenManager.TokenManagerDisplay(document.getElementById('token-list'), manager)
     manager.add(new Totp.Totp('i80and@gmail.com', Sjcl.codec.utf8String.toBits('foobar'), 30))
     for(var i = 0; i < 100; i += 1) {
         manager.add(new Totp.Totp(i.toString(), Sjcl.codec.utf8String.toBits('foobar' + i.toString()), 30))
