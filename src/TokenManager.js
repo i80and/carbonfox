@@ -94,7 +94,7 @@ var TokenManager = function() {
     this.onremove = function() {}
 }
 
-TokenManager.prototype.add = function(totp) {
+TokenManager.prototype.addTotp = function(totp) {
     var _this = this
 
     if(totp.identity in this.identities) {
@@ -122,6 +122,15 @@ TokenManager.prototype.add = function(totp) {
 
     this.timers[totp.interval][totp.identity] = null
     this.onadd(totp)
+}
+
+TokenManager.prototype.addPassword = function(token) {
+    if(token.identity in this.identities) {
+        throw 'Duplicate identity ' + token.identity
+    }
+
+    this.identities[token.identity] = token
+    this.onadd(token)
 }
 
 TokenManager.prototype.remove = function(totp) {

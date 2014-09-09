@@ -74,24 +74,6 @@ var selfTest = function() {
     }
 }
 
-var Totp = function(identity, secretKey, interval, options) {
-    this.identity = identity
-    this.secretKey = secretKey
-    this.interval = interval
-    this.options = options
-}
-
-Totp.prototype.getKey = function() {
-    return totp(this.secretKey, 0, this.interval, this.options)
-}
-
-Totp.prototype.timeUntilNextTick = function() {
-    var now = (new Date()).valueOf() / 1000
-    var remaining = this.interval - (now - (Math.floor(now / this.interval) * this.interval))
-    return Math.abs(remaining)
-}
-
 exports.hotp = hotp
 exports.totp = totp
 exports.selfTest = selfTest
-exports.Totp = Totp

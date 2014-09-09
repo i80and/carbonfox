@@ -1,7 +1,7 @@
 'use strict';
 
 var TokenManager = require('./TokenManager.js')
-var Totp = require('./Totp.js')
+var Tokens = require('./Tokens.js')
 var Base32 = require('./Base32.js')
 var Toolbar = require('./Toolbar.js')
 var SecureStorage = require('./SecureStorage.js')
@@ -10,11 +10,6 @@ var LoginPane = require('./LoginPane.js')
 var Sjcl = require('./deps/sjcl.js')
 
 window.addEventListener('load', function() {
-    // If something about the environment is exposing a bug in our implementation,
-    // let's find it out now.
-    Base32.selfTest()
-    Totp.selfTest()
-
     // Make sure the browser offers random numbers, to avoid possible silent nonsense
     if(window.crypto.getRandomValues === undefined) {
         throw 'Need browser support for random values'
@@ -58,9 +53,9 @@ window.addEventListener('load', function() {
 
     var manager = new TokenManager.TokenManager()
     var display = new TokenManager.TokenManagerDisplay(document.getElementById('token-list'), manager)
-    manager.add(new Totp.Totp('i80and@gmail.com', Sjcl.codec.utf8String.toBits('foobar'), 30))
+    manager.addTotp(new Tokens.TotpToken('i80and@gmail.com', Sjcl.codec.utf8String.toBits('foobar'), 30))
     for(var i = 0; i < 100; i += 1) {
-        manager.add(new Totp.Totp(i.toString(), Sjcl.codec.utf8String.toBits('foobar' + i.toString()), 30))
+        manager.addTotp(new Tokens.TotpToken(i.toString(), Sjcl.codec.utf8String.toBits('foobar' + i.toString()), 30))
     }
     display.refresh()
 
@@ -96,7 +91,7 @@ window.addEventListener('load', function() {
 
         options.digits = parseInt(manualTotpPane.digitsInput)
 
-        return new Totp.Totp(
+        return new Tokens.TotpToken(
             this.identityInput.value,
             Base32.toBits(this.secretKeyInput.value),
             parseInt(this.intervalInput.value),
