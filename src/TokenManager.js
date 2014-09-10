@@ -189,15 +189,17 @@ var TokenManagerDisplay = function(element, manager) {
 }
 
 TokenManagerDisplay.prototype.refresh = function(dirtyIdentities) {
+    var identity
+
     if(dirtyIdentities === undefined) {
         dirtyIdentities = []
-        for(var identity in this.manager.identities) {
+        for(identity in this.manager.identities) {
             dirtyIdentities.push(identity)
         }
     }
 
     for(var i = 0; i < dirtyIdentities.length; i += 1) {
-        var identity = dirtyIdentities[i]
+        identity = dirtyIdentities[i]
         this.elements[identity].refresh(this.manager.get(identity))
     }
 }

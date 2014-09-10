@@ -9,8 +9,7 @@ var Toolbar = function(element) {
     this.element.style.display = 'block'
     this.hide()
 
-    window.addEventListener('click', function(ev) {
-        console.log(ev)
+    window.addEventListener('click', function() {
         _this.hide()
     })
 }
