@@ -30,6 +30,10 @@ var PasswordToken = function(identity, secretKey) {
     this.secretKey = secretKey
 }
 
+PasswordToken.prototype.getKey = function() {
+    return this.secretKey
+}
+
 PasswordToken.prototype.load = function(obj) {
     return new PasswordToken(obj.identity, obj.secretKey)
 }

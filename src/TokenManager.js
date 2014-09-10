@@ -1,6 +1,7 @@
 'use strict';
 
 var Toolbar = require('./Toolbar.js')
+var Tokens = require('./Tokens.js')
 
 var TokenDisplay = function(parent, token) {
     var _this = this
@@ -94,6 +95,29 @@ var TokenManager = function() {
     this.onremove = function() {}
 }
 
+TokenManager.prototype.serialize = function() {
+    var output = {}
+    output.tokens = []
+
+    for(var identity in this.identities) {
+        output.push(this.identities[identity])
+    }
+
+    return output
+}
+
+TokenManager.prototype.load = function(obj) {
+    for(var i = 0; i < obj.tokens.length; i += 1) {
+        var token = Tokens.load(obj.tokens[i])
+
+        if(token.type === 'totp') {
+            this.addTotp(token)
+        } else if(token.type === 'password') {
+            this.addPassword(token)
+        }
+    }
+}
+
 TokenManager.prototype.addTotp = function(totp) {
     var _this = this
 
@@ -156,6 +180,7 @@ var TokenManagerDisplay = function(element, manager) {
 
     manager.onadd = function(totp) {
         _this.elements[totp.identity] = new TokenDisplay(_this.rootElement, totp)
+        _this.refresh([totp.identity])
     }
 
     manager.onremove = function(identity) {
@@ -165,10 +190,14 @@ var TokenManagerDisplay = function(element, manager) {
 
 TokenManagerDisplay.prototype.refresh = function(dirtyIdentities) {
     if(dirtyIdentities === undefined) {
-        dirtyIdentities = this.manager.identities
+        dirtyIdentities = []
+        for(var identity in this.manager.identities) {
+            dirtyIdentities.push(identity)
+        }
     }
 
-    for(var identity in dirtyIdentities) {
+    for(var i = 0; i < dirtyIdentities.length; i += 1) {
+        var identity = dirtyIdentities[i]
         this.elements[identity].refresh(this.manager.get(identity))
     }
 }

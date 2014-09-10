@@ -57,7 +57,6 @@ window.addEventListener('load', function() {
     for(var i = 0; i < 100; i += 1) {
         manager.addTotp(new Tokens.TotpToken(i.toString(), Sjcl.codec.utf8String.toBits('foobar' + i.toString()), 30))
     }
-    display.refresh()
 
     var addWhatPane = {}
     addWhatPane.slidePane = new SlidePane.SlidePane(document.getElementById('pane-add-what'))
@@ -89,7 +88,10 @@ window.addEventListener('load', function() {
             throw 'Invalid hash function ' + manualTotpPane.hashFunctionInput.value
         }
 
-        options.digits = parseInt(manualTotpPane.digitsInput)
+        options.digits = parseInt(manualTotpPane.digitsInput.value)
+        if(isNaN(options.digits)) {
+            throw 'Invalid digit number ' + manualTotpPane.digitsInput.value
+        }
 
         return new Tokens.TotpToken(
             this.identityInput.value,
@@ -100,6 +102,19 @@ window.addEventListener('load', function() {
 
     var addPasswordPane = {}
     addPasswordPane.slidePane = new SlidePane.SlidePane(document.getElementById('pane-add-password'))
+    addPasswordPane.websiteInput = document.getElementById('password-website-input')
+    addPasswordPane.usernameInput = document.getElementById('password-username-input')
+    addPasswordPane.passwordInput = document.getElementById('password-password-input')
+    addPasswordPane.reset = function() {
+        this.websiteInput.value = ''
+        this.usernameInput.value = ''
+        this.passwordInput.value = ''
+    }
+
+    addPasswordPane.makePassword = function() {
+        var identity = this.websiteInput.value + ':' + this.usernameInput.value
+        return new Tokens.PasswordToken(identity, this.passwordInput.value)
+    }
 
     document.getElementById('add-identity').onclick = function() {
         addWhatPane.slidePane.open()
@@ -110,7 +125,8 @@ window.addEventListener('load', function() {
     }
 
     document.getElementById('save-identity-input').onclick = function() {
-        manager.add(manualTotpPane.makeTotp())
+        manager.addTotp(manualTotpPane.makeTotp())
+        addWhatPane.slidePane.close()
         manualTotpPane.slidePane.close()
         manualTotpPane.reset()
     }
@@ -121,6 +137,13 @@ window.addEventListener('load', function() {
 
     document.getElementById('add-manual-password-input').onclick = function() {
         addPasswordPane.slidePane.open()
+    }
+
+    document.getElementById('save-password-input').onclick = function() {
+        manager.addPassword(addPasswordPane.makePassword())
+        addWhatPane.slidePane.close()
+        addPasswordPane.slidePane.close()
+        addPasswordPane.reset()
     }
 
     document.getElementById('close-manual-password-input').onclick = function() {
