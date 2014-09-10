@@ -59,23 +59,4 @@ var toBits = function(input) {
     return Sjcl.codec.hex.toBits(output)
 }
 
-var selfTest = function() {
-    var tests = {
-        '': '',
-        'f': 'MY======',
-        'fo': 'MZXQ====',
-        'foo': 'MZXW6===',
-        'foob': 'MZXW6YQ=',
-        'fooba': 'MZXW6YTB',
-        'foobar': 'MZXW6YTBOI======' }
-
-    for(var ascii in tests) {
-        var decoded = Sjcl.codec.utf8String.fromBits(toBits(tests[ascii]))
-        if(decoded !== ascii) {
-            throw 'Base32 check failed: decoding ' + tests[ascii] + ' yielded ' + decoded
-        }
-    }
-}
-
 exports.toBits = toBits
-exports.selfTest = selfTest

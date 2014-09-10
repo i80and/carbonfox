@@ -1,5 +1,5 @@
 TARGETS=js/bundle.min.js
-.PHONY: $(TARGETS)
+.PHONY: $(TARGETS) test check run clean
 
 JSQRCODE_SRC=src/deps/jsqrcode/src/grid.js src/deps/jsqrcode/src/version.js src/deps/jsqrcode/src/detector.js src/deps/jsqrcode/src/formatinf.js src/deps/jsqrcode/src/errorlevel.js src/deps/jsqrcode/src/bitmat.js src/deps/jsqrcode/src/datablock.js src/deps/jsqrcode/src/bmparser.js src/deps/jsqrcode/src/datamask.js src/deps/jsqrcode/src/rsdecoder.js src/deps/jsqrcode/src/gf256poly.js src/deps/jsqrcode/src/gf256.js src/deps/jsqrcode/src/decoder.js src/deps/jsqrcode/src/qrcode.js src/deps/jsqrcode/src/findpat.js src/deps/jsqrcode/src/alignpat.js src/deps/jsqrcode/src/databr.js
 
@@ -13,6 +13,9 @@ js/bundle.js: src/*.js
 
 check:
 	./node_modules/.bin/jshint src/ --exclude src/deps
+
+test:
+	./node_modules/.bin/mocha
 
 run:
 	python3 -m http.server || python2 -m SimpleHTTPServer || python -m SimpleHTTPServer
