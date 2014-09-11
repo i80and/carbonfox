@@ -20,7 +20,7 @@ TotpToken.prototype.timeUntilNextTick = function() {
     return Math.abs(remaining)
 }
 
-TotpToken.prototype.load = function(obj) {
+TotpToken.load = function(obj) {
     return new TotpToken(obj.identity, obj.secretKey, obj.interval, obj.options)
 }
 
@@ -34,7 +34,7 @@ PasswordToken.prototype.getKey = function() {
     return this.secretKey
 }
 
-PasswordToken.prototype.load = function(obj) {
+PasswordToken.load = function(obj) {
     return new PasswordToken(obj.identity, obj.secretKey)
 }
 

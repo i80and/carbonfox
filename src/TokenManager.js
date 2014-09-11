@@ -3,6 +3,12 @@
 var Toolbar = require('./Toolbar.js')
 var Tokens = require('./Tokens.js')
 
+var ErrorDuplicate = function(message) {
+    this.message = 'Duplicate identity: ' + message
+}
+ErrorDuplicate.prototype = new Error()
+ErrorDuplicate.prototype.constructor = ErrorDuplicate
+
 var TokenDisplay = function(parent, token) {
     var _this = this
 
@@ -100,29 +106,33 @@ TokenManager.prototype.serialize = function() {
     output.tokens = []
 
     for(var identity in this.identities) {
-        output.push(this.identities[identity])
+        output.tokens.push(this.identities[identity])
     }
 
     return output
 }
 
-TokenManager.prototype.load = function(obj) {
+TokenManager.load = function(obj) {
+    var result = new TokenManager()
+
     for(var i = 0; i < obj.tokens.length; i += 1) {
         var token = Tokens.load(obj.tokens[i])
 
         if(token.type === 'totp') {
-            this.addTotp(token)
+            result.addTotp(token)
         } else if(token.type === 'password') {
-            this.addPassword(token)
+            result.addPassword(token)
         }
     }
+
+    return result
 }
 
 TokenManager.prototype.addTotp = function(totp) {
     var _this = this
 
     if(totp.identity in this.identities) {
-        throw 'Duplicate identity ' + totp.identity
+        throw new ErrorDuplicate(totp.identity)
     }
 
     var tick = function() {
@@ -150,21 +160,29 @@ TokenManager.prototype.addTotp = function(totp) {
 
 TokenManager.prototype.addPassword = function(token) {
     if(token.identity in this.identities) {
-        throw 'Duplicate identity ' + token.identity
+        throw new ErrorDuplicate(token.identity)
     }
 
     this.identities[token.identity] = token
     this.onadd(token)
 }
 
-TokenManager.prototype.remove = function(totp) {
-    delete this.identities[totp.identity]
-    delete this.timers[totp.interval][totp.identity]
-    this.onremove(totp.identity)
+TokenManager.prototype.remove = function(identity) {
+    var token = this.identities[identity]
+
+    if(token.type === 'totp') {
+        delete this.timers[token.interval][identity]
+    }
+
+    delete this.identities[identity]
+    this.onremove(identity)
 }
 
 TokenManager.prototype.get = function(identity) {
-    return this.identities[identity].getKey()
+    var token = this.identities[identity]
+    if(token === undefined) { return undefined }
+
+    return token.getKey()
 }
 
 var TokenManagerDisplay = function(element, manager) {
@@ -204,5 +222,6 @@ TokenManagerDisplay.prototype.refresh = function(dirtyIdentities) {
     }
 }
 
+exports.ErrorDuplicate = ErrorDuplicate
 exports.TokenManager = TokenManager
 exports.TokenManagerDisplay = TokenManagerDisplay
