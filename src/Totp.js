@@ -1,6 +1,7 @@
 'use strict';
 
 var Sjcl = require('./deps/sjcl.js')
+var Util = require('./Util.js')
 
 var hotp = function(secretKey, counter, options) {
     // See RFC-4226
@@ -9,12 +10,26 @@ var hotp = function(secretKey, counter, options) {
         options = {}
     }
 
-    if(options.digits === undefined) {
-        options.digits = 6
+    var digits = options.digits
+    if(digits === undefined) {
+        digits = 6
     }
 
-    if(options.hash === undefined) {
-        options.hash = Sjcl.hash.sha1
+    var hash = options.hash
+    if(hash === undefined) {
+        hash = 'sha1'
+    }
+
+    if(hash === 'sha1') {
+        hash = Sjcl.hash.sha1
+    } else if(hash === 'sha256') {
+        hash = Sjcl.hash.sha256
+    } else if(hash === 'sha512') {
+        hash = Sjcl.hash.sha512
+    } else if(Util.isFunction(hash)) {
+        hash = hash
+    } else {
+        throw new Error('Unknown hash function')
     }
 
     // SJCL takes a special format called bit arrays composed of 32-bit integers.
@@ -22,7 +37,7 @@ var hotp = function(secretKey, counter, options) {
     var counterBitArray = [0 & 0xffffffff, counter >> 32 & 0xffffffff]
 
     // Compute the HMAC and convert it into a bytewise format easy for us to wrangle
-    var hmac = new Sjcl.misc.hmac(secretKey, options.hash)
+    var hmac = new Sjcl.misc.hmac(secretKey, hash)
     var rawhs = hmac.encrypt(counterBitArray)
     var hs = new Uint8Array(rawhs.length * 4)
 
@@ -41,14 +56,14 @@ var hotp = function(secretKey, counter, options) {
            | (hs[offset+2] & 0xff) <<  8
            | (hs[offset+3] & 0xff)
 
-    var d = snum % (Math.pow(10, options.digits))
+    var d = snum % (Math.pow(10, digits))
     return d
 }
 
-var totp = function(secretKey, startEpoch, timestep, options) {
+var totp = function(secretKey, startEpoch, now, timestep, options) {
     // See RFC-6238
 
-    var now = (new Date()).valueOf() / 1000
+    now = now.valueOf() / 1000
     var timeCounter = Math.floor((now - startEpoch) / timestep)
     return hotp(secretKey, timeCounter, options)
 }

@@ -58,7 +58,8 @@ describe('TokenManager', function() {
                     }
                 ]
             })
-        }),
+        })
+
         it('should return an empty representation', function() {
             var manager = new TokenManager.TokenManager()
             var result = manager.serialize()

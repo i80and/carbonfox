@@ -7,21 +7,56 @@ var TotpToken = function(identity, secretKey, interval, options) {
     this.identity = identity
     this.secretKey = secretKey
     this.interval = interval
-    this.options = options
+
+    if(options === undefined) {
+        options = {}
+    }
+
+    this.epoch = options.epoch
+    if(this.epoch === undefined) {
+        this.epoch = new Date(0)
+    }
+
+    this.hash = options.hash
+    if(this.hash === undefined) {
+        this.hash = 'sha1'
+    }
+
+    this.digits = options.digits
+    if(this.digits === undefined) {
+        this.digits = 6
+    }
 }
 
-TotpToken.prototype.getKey = function() {
-    return Totp.totp(this.secretKey, 0, this.interval, this.options)
+TotpToken.prototype.getKey = function(now) {
+    if(now === undefined) {
+        now = new Date()
+    }
+
+    var options = {}
+    options.epoch = this.epoch
+    options.hash = this.hash
+    options.digits = this.digits
+
+    return Totp.totp(this.secretKey, this.epoch, now, this.interval, options)
 }
 
 TotpToken.prototype.timeUntilNextTick = function() {
     var now = (new Date()).valueOf() / 1000
+    now -= this.epoch.valueOf() / 1000
     var remaining = this.interval - (now - (Math.floor(now / this.interval) * this.interval))
-    return Math.abs(remaining)
+
+    if(remaining < 0) { return 0 }
+    return remaining
 }
 
 TotpToken.load = function(obj) {
-    return new TotpToken(obj.identity, obj.secretKey, obj.interval, obj.options)
+    var options = {}
+    options.epoch = new Date(obj.epoch)
+    options.hash = obj.hash
+    options.digits = obj.digits
+
+    return new TotpToken(obj.identity, obj.secretKey, obj.interval, options)
 }
 
 var PasswordToken = function(identity, secretKey) {
