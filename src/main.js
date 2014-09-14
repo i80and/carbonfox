@@ -2,10 +2,11 @@
 
 var TokenManager = require('./TokenManager.js')
 var Tokens = require('./Tokens.js')
-var Base32 = require('./Base32.js')
 var Toolbar = require('./Toolbar.js')
 var SecureStorage = require('./SecureStorage.js')
 var SlidePane = require('./SlidePane.js')
+var ManualTotpPane = require('./ManualTotpPane.js')
+var PasswordPane = require('./PasswordPane.js')
 var LoginPane = require('./LoginPane.js')
 var Sjcl = require('./deps/sjcl.js')
 
@@ -61,60 +62,8 @@ window.addEventListener('load', function() {
     var addWhatPane = {}
     addWhatPane.slidePane = new SlidePane.SlidePane(document.getElementById('pane-add-what'))
 
-    var manualTotpPane = {}
-    manualTotpPane.slidePane = new SlidePane.SlidePane(document.getElementById('pane-add-manual-totp'))
-    manualTotpPane.identityInput = document.getElementById('identity-input')
-    manualTotpPane.secretKeyInput = document.getElementById('secret-input')
-    manualTotpPane.hashFunctionInput = document.getElementById('hash-type-input')
-    manualTotpPane.intervalInput = document.getElementById('interval-input')
-    manualTotpPane.digitsInput = document.getElementById('digits-input')
-    manualTotpPane.reset = function() {
-        this.identityInput.value = ''
-        this.secretKeyInput.value = ''
-        this.hashFunctionInput.value = 'sha1'
-        this.intervalInput.value = '30'
-        this.digitsInput = '6'
-    }
-
-    manualTotpPane.makeTotp = function() {
-        var options = {}
-        if(manualTotpPane.hashFunctionInput.value === 'sha1') {
-            options.hash = Sjcl.hash.sha1
-        } else if(manualTotpPane.hashFunctionInput.value === 'sha256') {
-            options.hash = Sjcl.hash.sha256
-        } else if(manualTotpPane.hashFunctionInput.value === 'sha512') {
-            options.hash = Sjcl.hash.sha512
-        } else {
-            throw 'Invalid hash function ' + manualTotpPane.hashFunctionInput.value
-        }
-
-        options.digits = parseInt(manualTotpPane.digitsInput.value)
-        if(isNaN(options.digits)) {
-            throw 'Invalid digit number ' + manualTotpPane.digitsInput.value
-        }
-
-        return new Tokens.TotpToken(
-            this.identityInput.value,
-            Base32.toBits(this.secretKeyInput.value),
-            parseInt(this.intervalInput.value),
-            options)
-    }
-
-    var addPasswordPane = {}
-    addPasswordPane.slidePane = new SlidePane.SlidePane(document.getElementById('pane-add-password'))
-    addPasswordPane.websiteInput = document.getElementById('password-website-input')
-    addPasswordPane.usernameInput = document.getElementById('password-username-input')
-    addPasswordPane.passwordInput = document.getElementById('password-password-input')
-    addPasswordPane.reset = function() {
-        this.websiteInput.value = ''
-        this.usernameInput.value = ''
-        this.passwordInput.value = ''
-    }
-
-    addPasswordPane.makePassword = function() {
-        var identity = this.websiteInput.value + ':' + this.usernameInput.value
-        return new Tokens.PasswordToken(identity, this.passwordInput.value)
-    }
+    var addPasswordPane = new PasswordPane.PasswordPane()
+    var manualTotpPane = new ManualTotpPane.ManualTotpPane()
 
     document.getElementById('add-identity').onclick = function() {
         addWhatPane.slidePane.open()
