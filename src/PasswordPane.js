@@ -10,13 +10,13 @@ var PasswordPane = function() {
     this.passwordInput = document.getElementById('password-password-input')
 }
 
-PasswordPane.reset = function() {
+PasswordPane.prototype.reset = function() {
     this.websiteInput.value = ''
     this.usernameInput.value = ''
     this.passwordInput.value = ''
 }
 
-PasswordPane.makePassword = function() {
+PasswordPane.prototype.makePassword = function() {
     var identity = this.websiteInput.value + ':' + this.usernameInput.value
     return new Tokens.PasswordToken(identity, this.passwordInput.value)
 }
