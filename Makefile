@@ -8,8 +8,11 @@ all: $(TARGETS)
 js/bundle.min.js: js/bundle.js
 	./node_modules/.bin/uglifyjs $^ --screw-ie8 -c "warnings=false" -b -o $@
 
-js/bundle.js: src/*.js
+js/bundle.js: js src/*.js
 	./node_modules/.bin/browserify src/main.js -o $@ -d
+
+js:
+	mkdir js
 
 check:
 	./node_modules/.bin/jshint src/ --exclude src/deps
