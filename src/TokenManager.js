@@ -96,9 +96,7 @@ var TokenManager = function() {
     this.identities = {}
     this.timers = {}
 
-    this.onupdate = function() {}
-    this.onadd = function() {}
-    this.onremove = function() {}
+    this.eventHandlers = {add: [], update: [], remove: []}
 }
 
 TokenManager.prototype.serialize = function() {
@@ -136,7 +134,7 @@ TokenManager.prototype.addTotp = function(totp) {
     }
 
     var tick = function() {
-        _this.onupdate(_this.timers[totp.interval])
+        _this.__handle('update', [_this.timers[totp.interval]])
     }
 
     this.identities[totp.identity] = totp
@@ -155,7 +153,7 @@ TokenManager.prototype.addTotp = function(totp) {
     }
 
     this.timers[totp.interval][totp.identity] = null
-    this.onadd(totp)
+    this.__handle('add', [totp])
 }
 
 TokenManager.prototype.addPassword = function(token) {
@@ -164,7 +162,7 @@ TokenManager.prototype.addPassword = function(token) {
     }
 
     this.identities[token.identity] = token
-    this.onadd(token)
+    this.__handle('add', [token])
 }
 
 TokenManager.prototype.remove = function(identity) {
@@ -175,7 +173,7 @@ TokenManager.prototype.remove = function(identity) {
     }
 
     delete this.identities[identity]
-    this.onremove(identity)
+    this.__handle('remove', [identity])
 }
 
 TokenManager.prototype.get = function(identity) {
@@ -185,6 +183,31 @@ TokenManager.prototype.get = function(identity) {
     return token.getKey()
 }
 
+TokenManager.prototype.addEventHandler = function(event, f) {
+    if(!(event in this.eventHandlers)) {
+        throw new Error('Unknown event type ' + event)
+    }
+
+    this.eventHandlers[event].push(f)
+}
+
+TokenManager.prototype.forEach = function(f) {
+    for(var token in this.identities) {
+        f(this.identities[token])
+    }
+}
+
+TokenManager.prototype.__handle = function(event, args) {
+    if(!(event in this.eventHandlers)) {
+        throw new Error('Unknown event type ' + event)
+    }
+
+    var handlers = this.eventHandlers[event]
+    for(var i = 0; i < handlers.length; i += 1) {
+        handlers[i].apply(this, args)
+    }
+}
+
 var TokenManagerDisplay = function(element, manager) {
     var _this = this
 
@@ -192,18 +215,27 @@ var TokenManagerDisplay = function(element, manager) {
     this.elements = {}
     this.manager = manager
 
-    manager.onupdate = function(identities) {
+    manager.addEventHandler('update', function(identities) {
         _this.refresh(identities)
-    }
+    })
 
-    manager.onadd = function(totp) {
-        _this.elements[totp.identity] = new TokenDisplay(_this.rootElement, totp)
-        _this.refresh([totp.identity])
-    }
+    manager.addEventHandler('add', function(totp) {
+        _this.__add(totp)
+    })
 
-    manager.onremove = function(identity) {
+    manager.addEventHandler('remove', function(identity) {
         delete _this.elements[identity]
-    }
+    })
+
+    // Add the backlog of tokens
+    this.manager.forEach(function(totp) {
+        _this.__add(totp)
+    })
+}
+
+TokenManagerDisplay.prototype.__add = function(totp) {
+    this.elements[totp.identity] = new TokenDisplay(this.rootElement, totp)
+    this.refresh([totp.identity])
 }
 
 TokenManagerDisplay.prototype.refresh = function(dirtyIdentities) {

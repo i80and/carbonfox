@@ -7,14 +7,15 @@ var Tokens = require('../src/Tokens.js')
 describe('TokenManager', function() {
     describe('#addPassword', function() {
         it('should add a password and call the onadd() callback', function() {
-            var wasCalled = false
+            var wasCalled = 0
 
             var manager = new TokenManager.TokenManager()
-            manager.onadd = function() { wasCalled = true }
+            manager.addEventHandler('add', function() { wasCalled += 1 })
+            manager.addEventHandler('add', function() { wasCalled += 1 })
 
             manager.addPassword(new Tokens.PasswordToken('example.com:me', 'password'))
             manager.addPassword(new Tokens.PasswordToken('example.com:me2', 'password'))
-            assert(wasCalled)
+            assert.equal(wasCalled, 4)
             assert.equal(manager.get('example.com:me'), 'password')
             assert.equal(manager.get('example.com:me2'), 'password')
 
@@ -30,7 +31,7 @@ describe('TokenManager', function() {
             var wasCalled = false
 
             var manager = new TokenManager.TokenManager()
-            manager.onremove = function() { wasCalled = true }
+            manager.addEventHandler('remove', function() { wasCalled = true })
 
             manager.addPassword(new Tokens.PasswordToken('example.com:me', 'password'))
             manager.addPassword(new Tokens.PasswordToken('example.com:me2', 'password'))

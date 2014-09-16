@@ -1,34 +1,30 @@
 'use strict';
 
 var TokenManager = require('./TokenManager.js')
-var Tokens = require('./Tokens.js')
-var Toolbar = require('./Toolbar.js')
 var SecureStorage = require('./SecureStorage.js')
 var SlidePane = require('./SlidePane.js')
 var ManualTotpPane = require('./ManualTotpPane.js')
 var PasswordPane = require('./PasswordPane.js')
 var LoginPane = require('./LoginPane.js')
-var Sjcl = require('./deps/sjcl.js')
 
-window.addEventListener('load', function() {
-    // Make sure the browser offers random numbers, to avoid possible silent nonsense
-    if(window.crypto.getRandomValues === undefined) {
-        throw 'Need browser support for random values'
-    }
+var CarbonFox = function() {
+    this.secureStorage = new SecureStorage.SecureStorage('carbonfox')
+    this.manager = new TokenManager.TokenManager()
+}
 
-    Toolbar.init()
-
-    var secureStorage = new SecureStorage.SecureStorage('carbonfox')
+CarbonFox.prototype.onInit = function() {
+    var _this = this
 
     var loginPane = new LoginPane.LoginPane()
-    if(!secureStorage.isInitialized()) {
+    if(!_this.secureStorage.isInitialized()) {
         loginPane.setupMode = true
     }
 
     loginPane.onentry = function(pin) {
-        secureStorage.unlock(pin).then(function() {
-            console.log('OK!')
+        _this.secureStorage.unlock(pin).then(function() {
+            _this.manager = TokenManager.TokenManager.load(_this.secureStorage.data)
             loginPane.slidePane.close()
+            _this.onLogin()
         }).catch(function(err) {
             console.error(err)
             loginPane.clear()
@@ -37,13 +33,14 @@ window.addEventListener('load', function() {
 
     loginPane.onsetup = function(pin) {
         // Make SURE we're not overwriting anything
-        if(secureStorage.isInitialized()) {
+        if(_this.secureStorage.isInitialized()) {
             throw 'Setting up again!'
         }
 
-        secureStorage.setup(pin).then(function() {
-            secureStorage.setupMode = false
+        _this.secureStorage.setup(pin).then(function() {
+            _this.secureStorage.setupMode = false
             loginPane.slidePane.close()
+            _this.onLogin()
         }).catch(function(err) {
             console.error(err)
         })
@@ -51,13 +48,20 @@ window.addEventListener('load', function() {
 
     loginPane.slidePane.open()
     loginPane.refresh()
+}
 
-    var manager = new TokenManager.TokenManager()
-    var display = new TokenManager.TokenManagerDisplay(document.getElementById('token-list'), manager)
-    manager.addTotp(new Tokens.TotpToken('i80and@gmail.com', Sjcl.codec.utf8String.toBits('foobar'), 30))
-    for(var i = 0; i < 100; i += 1) {
-        manager.addTotp(new Tokens.TotpToken(i.toString(), Sjcl.codec.utf8String.toBits('foobar' + i.toString()), 30))
+CarbonFox.prototype.onLogin = function() {
+    var _this = this
+    var display = new TokenManager.TokenManagerDisplay(document.getElementById('token-list'),
+                                                       _this.manager)
+
+    var save = function() {
+        _this.secureStorage.data = _this.manager.serialize()
+        _this.secureStorage.save()
     }
+
+    _this.manager.addEventHandler('add', save)
+    _this.manager.addEventHandler('remove', save)
 
     var addWhatPane = {}
     addWhatPane.slidePane = new SlidePane.SlidePane(document.getElementById('pane-add-what'))
@@ -74,7 +78,7 @@ window.addEventListener('load', function() {
     }
 
     document.getElementById('save-identity-input').onclick = function() {
-        manager.addTotp(manualTotpPane.makeTotp())
+        _this.manager.addTotp(manualTotpPane.makeTotp())
         addWhatPane.slidePane.close()
         manualTotpPane.slidePane.close()
         manualTotpPane.reset()
@@ -89,7 +93,7 @@ window.addEventListener('load', function() {
     }
 
     document.getElementById('save-password-input').onclick = function() {
-        manager.addPassword(addPasswordPane.makePassword())
+        _this.manager.addPassword(addPasswordPane.makePassword())
         addWhatPane.slidePane.close()
         addPasswordPane.slidePane.close()
         addPasswordPane.reset()
@@ -103,4 +107,14 @@ window.addEventListener('load', function() {
         manualTotpPane.slidePane.close()
         manualTotpPane.reset()
     }
+}
+
+window.addEventListener('load', function() {
+    // Make sure the browser offers random numbers, to avoid possible silent nonsense
+    if(window.crypto.getRandomValues === undefined) {
+        throw 'Need browser support for random values'
+    }
+
+    var app = new CarbonFox()
+    app.onInit()
 })
