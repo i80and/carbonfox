@@ -113,11 +113,15 @@ carbonControllers.controller('LoginController', function($scope, $rootScope, $lo
         $scope.clear()
     }})
 
-carbonControllers.controller('PasswordController', function($scope, $rootScope, $window) {
+carbonControllers.controller('PasswordController', function($scope, $location, $window) {
     $scope.entries = $window.theSecureStorage.cache
 
     $scope.add = function() {
-        $rootScope.$broadcast('show-add-password')
+        $location.path('/edit')
+    }
+
+    $scope.edit = function(entry) {
+        $location.path(`/edit/${entry._id}`)
     }
 
     $scope.show = function(entry) {
@@ -128,14 +132,14 @@ carbonControllers.controller('PasswordController', function($scope, $rootScope, 
             console.error(err)
         })
     }
-
-    $scope.edit = function(entry) {
-        $rootScope.$broadcast('show-add-password', entry)
-    }
 })
 
-carbonControllers.controller('AddPasswordController', function($scope, $rootScope, $window) {
-    $scope.isBusy = false
+carbonControllers.controller('EditPasswordController', function($scope, $rootScope, $routeParams, $location, $window) {
+    $scope.domain = ''
+    $scope.username = ''
+    $scope.password = ''
+    $scope.comment = ''
+    $scope.editingEntry = null
 
     let makeEntry = function() {
         let _id
@@ -157,18 +161,13 @@ carbonControllers.controller('AddPasswordController', function($scope, $rootScop
 
     $scope.save = function() {
         if($scope.domain === '' || $scope.username === '' || $scope.password === '') { return }
-        if($scope.isBusy) { return }
-        $scope.isBusy = true
 
         // XXX Should warn the user if they're overwriting an existing entry
         let entry = makeEntry()
 
         $window.theSecureStorage.save(entry).then(() => {
             $rootScope.$broadcast('show-message', 'Saved!')
-            $scope.$apply(() => {
-                $scope.isBusy = false
-                $scope.cancel()
-            })
+            $location.path('/view')
         }).catch((err) => {
             console.error(err)
             if(err.name === 'conflict') {
@@ -176,7 +175,6 @@ carbonControllers.controller('AddPasswordController', function($scope, $rootScop
             } else if(err.name !== undefined) {
                 $rootScope.$broadcast('show-message', `Error: ${err.name}`)
             }
-            $scope.$apply(() => { $scope.isBusy = false })
         })
     }
 
@@ -191,13 +189,7 @@ carbonControllers.controller('AddPasswordController', function($scope, $rootScop
     }
 
     $scope.cancel = function() {
-        $scope.domain = ''
-        $scope.username = ''
-        $scope.password = ''
-        $scope.comment = ''
-        $scope.hidden = true
-
-        $scope.editingEntry = null
+        $location.path('/view')
     }
 
     $scope.delete = function() {
@@ -207,8 +199,8 @@ carbonControllers.controller('AddPasswordController', function($scope, $rootScop
 
         if(window.confirm('Are you sure you want to delete this password?')) {
             $window.theSecureStorage.delete($scope.editingEntry).then(() => {
-                $scope.$apply(() => $scope.cancel())
                 $rootScope.$broadcast('show-message', 'Deleted!')
+                $location.path('/view')
             }, (err) => {
                 console.error(err)
                 $rootScope.$broadcast('show-message', 'Error deleting')
@@ -216,18 +208,23 @@ carbonControllers.controller('AddPasswordController', function($scope, $rootScop
         }
     }
 
-    $rootScope.$on('show-add-password', function(event, entry) {
-        if(entry !== undefined) {
-            // We're editing an existing entry
-            $scope.domain = entry.domain
-            $scope.username = entry.username
-            $scope.comment = entry.comment
-
-            $scope.editingEntry = entry
+    let tryLoad = function() {
+        if($routeParams === null) {
+            return
         }
 
-        $scope.hidden = false
-    })
+        // We're editing an existing entry
+        let entry = $window.theSecureStorage.cache[$routeParams.id]
+        if(entry === undefined) {
+            return
+        }
 
-    $scope.cancel()
+        $scope.domain = entry.domain
+        $scope.username = entry.username
+        $scope.comment = entry.comment
+
+        $scope.editingEntry = entry
+    }
+
+    tryLoad()
 })

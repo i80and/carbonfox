@@ -32,13 +32,11 @@
 
 .top-pane {
     transition: top 0.25s ease;
-    background-color: orange;
     width: 100%;
     min-height: 100%;
     position: absolute;
     top: 0px;
     box-shadow: 0px 0px 2px black;
-    box-sizing: border-box;
 
     padding: 0px 5px 5px 5px;
     border-radius: 0px 0px 10px 10px
@@ -51,15 +49,14 @@
     top: calc(-100% - 10px);
 }
 
-.top-pane #save-button {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-}
-
 .lock-icon {
     margin-left: auto;
     padding-right: 10px;
     display: flex;
     align-items: center;
+}
+
+#add-password-pane {
+    background-color: orange;
+    padding: 5px;
 }

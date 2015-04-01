@@ -1,5 +1,5 @@
-<pane id="loginPane" ng-controller="LoginController">
-    <div class="title">Carbon Fox</div>
+<div id="title">Carbon Fox</div>
+<section id="loginPane" ng-controller="LoginController">
     <div id="lock-pane-input" ng-class="(pinDisplayList.length == 0) ? 'empty' : ''">
         {{pinDisplayList.join(' ') || (isBusy ? 'Checking your PIN...' : 'Enter PIN')}}
     </div>
@@ -29,4 +29,4 @@
             <a ng-click="backspace()"><div class="backspace">Bkspace</div><div>&#160;</div></a>
         </section>
     </div>
-</pane>
+</section>

@@ -17,6 +17,14 @@ carbonfoxApp.config(function($routeProvider) {
             templateUrl: 'partials/passwordPane.html',
             controller: 'PasswordController'
         }).
+        when('/edit/:id', {
+            templateUrl: 'partials/editPasswordPane.html',
+            controller: 'EditPasswordController'
+        }).
+        when('/edit', {
+            templateUrl: 'partials/editPasswordPane.html',
+            controller: 'EditPasswordController'
+        }).
         when('/welcome', {
             templateUrl: 'partials/welcomePane.html',
             controller: 'WelcomeController'

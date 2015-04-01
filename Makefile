@@ -1,4 +1,4 @@
-.PHONY: all js/app.min.js js/app.js check clean
+.PHONY: all build/js/app.min.js build/js/app.js check clean
 
 all: build/js/app.min.js
 	install src/deps/*.js build/js/
