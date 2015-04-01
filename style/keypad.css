@@ -1,0 +1,93 @@
+#loginPane {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+#keypad {
+    width: 100%;
+    height: 100%;
+    max-width: 75em;
+    margin-left: auto;
+    margin-right: auto;
+
+    background-color: orange;
+    box-shadow: 0px 0px 2px;
+
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap;
+    align-items: center;
+    flex-direction: column;
+
+    /* Grow the keypad, but keep the title bar and entry pad fixed */
+    flex: 1;
+}
+
+#keypad section {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+
+    border-bottom: 1px inset orange;
+}
+
+#keypad section a {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+    justify-content: center;
+    width: 30%;
+
+    text-decoration: none;
+    color: white;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+#keypad section a:not(:empty) {
+    cursor: pointer;
+}
+
+#keypad section a:not(:empty):active {
+    background-color: #b2f2ff;
+    color: #fff;
+}
+
+#keypad section a div:first-child {
+    font-size: 1.5em;
+}
+
+#keypad section a div.backspace {
+    font-size: 1em;
+}
+
+#lock-pane-input {
+    height: 75px;
+    width: 100%;
+    text-align: center;
+    padding: 0px;
+    font-size: 2em;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#lock-pane-input.empty {
+    font-size: 1em;
+    color: gray;
+}
+
+#loginPane #login-button {
+    position: absolute;
+    right: 10px;
+    top: 50px;
+
+    transition: box-shadow 0.2s ease, transform 0.2s ease, background-color 0.4s ease;
+}

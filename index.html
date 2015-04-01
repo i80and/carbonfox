@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html ng-app="carbonfoxApp" ng-csp>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1">
+
+    <title>Carbon Fox</title>
+
+    <link rel="stylesheet" href="style/main.css">
+    <link rel="stylesheet" href="style/buttons.css">
+    <link rel="stylesheet" href="style/fonts.css">
+    <link rel="stylesheet" href="style/keypad.css">
+    <link rel="stylesheet" href="style/view.css">
+    <link rel="stylesheet" href="style/font-awesome.min.css">
+
+    <script src="js/pouchdb-3.3.0.min.js"></script>
+    <script src="js/es6-promise-2.0.1.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/angular-route.min.js"></script>
+    <script src="js/triplesec.js"></script>
+    <script src="js/app.min.js"></script>
+</head>
+
+<body>
+    <div ng-view></div>
+    <div id="floating-message" class="hidden" ng-controller="FloatingMessageController"></div>
+</body>
+
+</html>
