@@ -23,33 +23,10 @@ carbonControllers.controller('FloatingMessageController', function($scope, $root
 
 carbonControllers.controller('WelcomeController', function() {})
 
-carbonControllers.controller('LoginController', function($scope, $rootScope, $location, $document, $timeout) {
+carbonControllers.controller('LoginController', function($scope, $rootScope, $location) {
     $scope.pinDisplayList = []
     $scope.pinList = []
     $scope.isBusy = false
-
-    let lockingTimeout = null
-
-    $document[0].addEventListener('visibilitychange', function() {
-        if(document.hidden) {
-            if(lockingTimeout !== null) { return }
-
-            // Lock the database if we're hidden for over 20 seconds
-            lockingTimeout = $timeout(() => {
-                window.theSecureStorage.lock()
-                lockingTimeout = null
-            }, 10 * 1000)
-        } else {
-            if(lockingTimeout !== null) {
-                $timeout.cancel(lockingTimeout)
-            }
-        }
-    })
-
-    window.theSecureStorage.onlock = () => {
-        $location.path('/login')
-        $scope.$apply()
-    }
 
     // A few super-trivial checks for horrible PINs
     const isStupidPassword = function(passwordList) {
@@ -115,6 +92,11 @@ carbonControllers.controller('LoginController', function($scope, $rootScope, $lo
 
 carbonControllers.controller('PasswordController', function($scope, $location, $window) {
     $scope.entries = $window.theSecureStorage.cache
+
+    window.theSecureStorage.onlock = () => {
+        $location.path('/login')
+        $scope.$apply()
+    }
 
     $scope.add = function() {
         $location.path('/edit')

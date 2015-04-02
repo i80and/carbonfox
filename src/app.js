@@ -50,3 +50,21 @@ window.reset = function() {
     SecureStorage.theSecureStorage.db.destroy()
     localStorage.clear()
 }
+
+var lockingTimeout = null
+
+document.addEventListener('visibilitychange', function() {
+    if(document.hidden) {
+        if(lockingTimeout !== null) { return }
+
+        // Lock the database if we're hidden for over 20 seconds
+        lockingTimeout = window.setTimeout(() => {
+            window.theSecureStorage.lock()
+            lockingTimeout = null
+        }, 10 * 1000)
+    } else {
+        if(lockingTimeout !== null) {
+            window.clearTimeout(lockingTimeout)
+        }
+    }
+})
