@@ -150,6 +150,7 @@ carbonControllers.controller('EditPasswordController', function($scope, $rootSco
         $window.theSecureStorage.save(entry).then(() => {
             $rootScope.$broadcast('show-message', 'Saved!')
             $location.path('/view')
+            $scope.$apply()
         }).catch((err) => {
             console.error(err)
             if(err.name === 'conflict') {
@@ -183,6 +184,7 @@ carbonControllers.controller('EditPasswordController', function($scope, $rootSco
             $window.theSecureStorage.delete($scope.editingEntry).then(() => {
                 $rootScope.$broadcast('show-message', 'Deleted!')
                 $location.path('/view')
+                $scope.$apply()
             }, (err) => {
                 console.error(err)
                 $rootScope.$broadcast('show-message', 'Error deleting')

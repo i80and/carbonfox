@@ -1,4 +1,5 @@
-#loginPane {
+#view > #loginPane {
+    height: 100%; /* Override the normal min-height, to keep this view from scrolling */
     display: flex;
     flex-direction: column;
 }

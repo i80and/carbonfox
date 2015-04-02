@@ -43,7 +43,7 @@ p.micro {
 }
 
 #floating-message {
-    position: absolute;
+    position: fixed;
     bottom: 20px;
     box-shadow: 0px 0px 2px black;
     background-color: #0af;
@@ -61,6 +61,7 @@ p.micro {
 }
 
 #floating-message.hidden {
+    pointer-events: none;
     opacity: 0.0;
 }
 
@@ -132,7 +133,7 @@ body .round-button {
 }
 
 #view > section {
-    height: 100%;
+    min-height: 100%;
     width: 100%;
     position: absolute;
     padding-top: 38px;
