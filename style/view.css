@@ -6,15 +6,20 @@
 
 #entry-list {
     padding-left: 0px;
+    margin-top: 0px;
 }
 
 #entry-list > li {
     display: flex;
     align-items: center;
-    width: 100%;
-    height: 6rem;
     cursor: pointer;
-    transition: color 0.2s ease;
+    width: calc(100% - 4.0rem);
+    height: 6rem;
+    margin-top: 0px;
+    margin-left: 3.0rem;
+    padding-left: 1rem;
+
+    transition: background-color 0.2s ease;
 }
 
 #entry-list > li > div {
@@ -22,7 +27,6 @@
     display: flex;
     align-items: center;
     padding-left: 0px;
-    margin-left: 3.0rem;
     margin-right: 1.5rem;
 }
 
@@ -59,4 +63,37 @@
 #add-password-pane {
     background-color: orange;
     padding: 5px;
+}
+
+#search-button {
+    padding: 10px;
+}
+
+#search-bar {
+    position: fixed;
+    left: 0px;
+    border-right: 1px solid seagreen;
+    height: 100%;
+}
+
+#search-bar > ul {
+    display: flex;
+    flex-direction: column;
+    top: 38px;
+    margin-top: 10px;
+    padding: 0px;
+    height: calc(100% - 38px - 10px);
+}
+
+#search-bar > ul > li {
+    font-size: 8pt;
+    list-style: none;
+    cursor: pointer;
+    flex-grow: 1;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+#search-bar > ul > li:hover {
+    color: #fff;
 }

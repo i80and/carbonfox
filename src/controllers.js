@@ -90,13 +90,31 @@ carbonControllers.controller('LoginController', function($scope, $rootScope, $lo
         $scope.clear()
     }})
 
-carbonControllers.controller('PasswordController', function($scope, $location, $window) {
-    $scope.entries = $window.theSecureStorage.cache
+carbonControllers.controller('PasswordController', function($scope, $location, $window, $document) {
+    $scope.entries = []
+    $scope.hidden = false
 
-    window.theSecureStorage.onlock = () => {
-        $location.path('/login')
-        $scope.$apply()
+    let refreshEntries = () => {
+        $scope.entries = []
+
+        for(let kv of $window.theSecureStorage.cache) {
+            const entry = kv[1]
+            $scope.entries.push(entry)
+        }
+
+        $scope.entries.sort((a,b) => {
+            if(a.domain > b.domain) { return 1 }
+            if(a.domain < b.domain) { return -1 }
+            return 0
+        })
     }
+
+    refreshEntries()
+
+    $document[0].addEventListener('visibilitychange', function() {
+        $scope.hidden = $document[0].hidden
+        $scope.$apply()
+    })
 
     $scope.add = function() {
         $location.path('/edit')
@@ -123,7 +141,7 @@ carbonControllers.controller('EditPasswordController', function($scope, $rootSco
     $scope.comment = ''
     $scope.editingEntry = null
 
-    let makeEntry = function() {
+    const makeEntry = function() {
         let _id
         let _rev
 
@@ -144,8 +162,7 @@ carbonControllers.controller('EditPasswordController', function($scope, $rootSco
     $scope.save = function() {
         if($scope.domain === '' || $scope.username === '' || $scope.password === '') { return }
 
-        // XXX Should warn the user if they're overwriting an existing entry
-        let entry = makeEntry()
+        const entry = makeEntry()
 
         $window.theSecureStorage.save(entry).then(() => {
             $rootScope.$broadcast('show-message', 'Saved!')
@@ -192,13 +209,15 @@ carbonControllers.controller('EditPasswordController', function($scope, $rootSco
         }
     }
 
-    let tryLoad = function() {
+    // If we're given an entry ID, try to load it from the cache. Otherwise,
+    // do nothing and continue editing an empty entry.
+    const tryLoad = function() {
         if($routeParams === null) {
             return
         }
 
         // We're editing an existing entry
-        let entry = $window.theSecureStorage.cache[$routeParams.id]
+        const entry = $window.theSecureStorage.cache[$routeParams.id]
         if(entry === undefined) {
             return
         }

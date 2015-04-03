@@ -108,7 +108,7 @@ class SecureStorage {
         this.idGenerator = new SequentialID()
         this.key = null
 
-        this.cache = {}
+        this.cache = new Map()
         this.onlock = function() {}
     }
 
@@ -134,7 +134,7 @@ class SecureStorage {
             })
         }).then((result) => {
             entry._rev = result.rev
-            this.cache[entry._id] = entry
+            this.cache.set(entry._id, entry)
         })
     }
 
@@ -173,14 +173,14 @@ class SecureStorage {
     lock() {
         if(this.key !== null) { this.key.scrub() }
         this.key = null
-        this.cache = {}
+        this.cache.clear()
         this.onlock()
     }
 
     refresh() {
         return new Promise((resolve, reject) => {
             this.db.allDocs({include_docs: true}).then((result) => {
-                this.cache = {}
+                this.cache.clear()
                 for(let row of result.rows) {
                     try {
                         const ciphertext = triplesec.WordArray.from_hex(row.doc.entry)
@@ -189,7 +189,7 @@ class SecureStorage {
                         parsed._id = row.doc._id
                         parsed._rev = row.doc._rev
                         const entry = SecureEntry.fromDocument(parsed)
-                        this.cache[entry._id] = entry
+                        this.cache.set(entry._id, entry)
                     } catch(e) {
                         return reject(e)
                     }
@@ -209,7 +209,7 @@ class SecureStorage {
         }
 
         return this.db.remove(entry._id, entry._rev).then(() => {
-            delete this.cache[entry._id]
+            this.cache.delete(entry._id)
         })
     }
 }
