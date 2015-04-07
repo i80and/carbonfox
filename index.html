@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="carbonfoxApp" ng-csp>
+<html>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1">
@@ -15,15 +15,14 @@
 
     <script src="js/pouchdb-3.3.1.min.js"></script>
     <script src="js/es6-promise-2.0.1.min.js"></script>
-    <script src="js/angular.min.js"></script>
-    <script src="js/angular-route.min.js"></script>
     <script src="js/triplesec.js"></script>
+    <script src="js/mithril.min.js"></script>
     <script src="js/app.min.js"></script>
 </head>
 
 <body>
-    <div id="view" ng-view></div>
-    <div id="floating-message" class="hidden" ng-controller="FloatingMessageController"></div>
+    <div id="root-container"></div>
+    <div id="floating-message" class="hidden"></div>
 </body>
 
 </html>

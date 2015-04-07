@@ -1,79 +1,32 @@
 import * as SecureStorage from './SecureStorage.js'
-window.theSecureStorage = SecureStorage.theSecureStorage
+import * as Floater from './Floater.js'
 
-let defaultPath = '/welcome'
-if(SecureStorage.theSecureStorage.isSetup()) {
-    defaultPath = '/login'
-}
+// App modules
+import * as Welcome from './Welcome.js'
+import * as Login from './Login.js'
+import * as View from './View.js'
+import * as Edit from './Edit.js'
 
-const carbonfoxApp = angular.module('carbonfoxApp', ['ngRoute', 'carbonControllers'])
-carbonfoxApp.config(function($routeProvider) {
-    // $routeProvider.
-    //     when('/login', {
-    //         templateUrl: 'partials/loginPane.html',
-    //         controller: 'LoginController'
-    //     }).
-    //     when('/view', {
-    //         templateUrl: 'partials/passwordPane.html',
-    //         controller: 'PasswordController'
-    //     }).
-    //     when('/edit/:id', {
-    //         templateUrl: 'partials/editPasswordPane.html',
-    //         controller: 'EditPasswordController'
-    //     }).
-    //     when('/edit', {
-    //         templateUrl: 'partials/editPasswordPane.html',
-    //         controller: 'EditPasswordController'
-    //     }).
-    //     when('/welcome', {
-    //         templateUrl: 'partials/welcomePane.html',
-    //         controller: 'WelcomeController'
-    //     }).
-    //     otherwise({
-    //         redirectTo: defaultPath
-    //     })
-})
-
-// Add support for a right-click handler
-carbonfoxApp.directive('ngRightClick', function($parse) {
-    return function(scope, element, attrs) {
-        const fn = $parse(attrs.ngRightClick)
-        element.bind('contextmenu', function(event) {
-            scope.$apply(function() {
-                event.preventDefault()
-                fn(scope, {$event:event})
-            })
-        })
+document.addEventListener('DOMContentLoaded', () => {
+    window.reset = () => {
+        window.localStorage.clear()
+        SecureStorage.theSecureStorage.db.destroy()
     }
-})
 
-// Debugging button: reset to factory state
-window.reset = function() {
-    SecureStorage.theSecureStorage.db.destroy()
-    localStorage.clear()
-}
+    Floater.init()
 
-// If the user switches away, we should lock the password database
-;(() => {
-    let lockingTimeout = null
+    const body = document.querySelector('#root-container')
 
-    document.addEventListener('visibilitychange', function() {
-        if(document.hidden) {
-            if(lockingTimeout !== null) { return }
+    let defaultPath = '/welcome'
+    if(SecureStorage.theSecureStorage.isSetup()) {
+        defaultPath = '/login'
+    }
 
-            // Lock the database if we're hidden for over 20 seconds
-            lockingTimeout = window.setTimeout(() => {
-                window.theSecureStorage.lock()
-                lockingTimeout = null
-            }, 10 * 1000)
-        } else {
-            if(lockingTimeout !== null) {
-                window.clearTimeout(lockingTimeout)
-            }
-        }
+    m.route(body, defaultPath, {
+        '/welcome': Welcome,
+        '/login': Login,
+        '/view': View,
+        '/edit': Edit,
+        '/edit/:id': Edit
     })
-
-    window.theSecureStorage.onlock = () => {
-        location.hash = '/'
-    }
-})()
+})

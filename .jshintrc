@@ -25,5 +25,5 @@
     "node": true,
     "esnext": true,
     
-    "globals": {"triplesec": false, "PouchDB": false, "crypto": false, "angular": false}
+    "globals": {"triplesec": false, "PouchDB": false, "crypto": false, "m": false}
 }

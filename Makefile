@@ -13,12 +13,12 @@ all: build/js/app.min.js
 	cp manifest.webapp build/
 
 build/js/app.min.js: build/js/app.js
-	cp build/js/app.js build/js/app.min.js
-	# ./node_modules/.bin/uglifyjs --screw-ie8 js/app.js > js/app.min.js
+	 cp build/js/app.js build/js/app.min.js
+	#./node_modules/.bin/uglifyjs --screw-ie8 build/js/app.js > build/js/app.min.js
 
 build/js/app.js: src/*.js
 	mkdir -p build/js
-	./node_modules/.bin/browserify -d -o build/js/app.js -e src/app.js src/controllers.js -t [ babelify --blacklist $(TRANSFORM_BLACKLIST) --sourceMapRelative . ]
+	./node_modules/.bin/browserify -d -o build/js/app.js -e src/app.js -t [ babelify --blacklist $(TRANSFORM_BLACKLIST) --sourceMapRelative . ]
 
 check:
 	./node_modules/.bin/jshint --verbose src/*.js
