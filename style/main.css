@@ -79,6 +79,19 @@ input, button {
     text-overflow: ellipsis;
 }
 
+textarea {
+    border-radius: 2px;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
+    font-size: 1.6rem;
+    margin: 0 0 1rem;
+    padding: 5px 1.2rem;
+    display: inline-block;
+    vertical-align: middle;
+    text-overflow: ellipsis;
+}
+
 button.recommend, .bb-button.recommend {
     background-color: #00caf2;
     color: #fff;

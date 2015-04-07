@@ -8,7 +8,7 @@ all: build/js/app.min.js
 	install src/deps/*.js build/js/
 	install src/crypto_worker.js build/js/
 	rsync -ra --delete style/ build/style
-	rsync -ra --delete partials/ build/partials
+	rsync -ra --delete dicts/ build/dicts
 	cp index.html build/
 	cp manifest.webapp build/
 

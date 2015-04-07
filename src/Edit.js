@@ -1,6 +1,6 @@
 import * as SecureStorage from './SecureStorage.js'
 import * as Floater from './Floater.js'
-import * as util from './util.js'
+import * as GeneratorDict from './GeneratorDict.js'
 
 class ViewModel {
     constructor(id) {
@@ -20,13 +20,19 @@ class ViewModel {
     }
 
     generate() {
-        let result = []
-        for(let i = 0; i < 4; i += 1) {
-            // XXX Dummy corpus
-            result.push(util.pick(['battery', 'horse', 'staple', 'correct']))
-        }
+        m.startComputation()
+        GeneratorDict.init().then(() => {
+            let result = []
+            for(let i = 0; i < 4; i += 1) {
+                result.push(GeneratorDict.getWord())
+            }
 
-        this.password(result.join(' '))
+            this.password(result.join(' '))
+            m.endComputation()
+        }, (err) => {
+            console.error(err)
+            m.endComputation()
+        })
     }
 
     cancel() {
@@ -99,7 +105,9 @@ export const view = function() {
                 placeholder: '(username)',
                 onchange: m.withAttr('value', vm.username),
                 value: vm.username()}),
-            m('input[type="text"]', {
+            m('textarea', {
+                rows: 3,
+                wrap: 'hard',
                 placeholder: '(password)',
                 onchange: m.withAttr('value', vm.password),
                 value: vm.password()}),
