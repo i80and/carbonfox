@@ -29,4 +29,27 @@ document.addEventListener('DOMContentLoaded', () => {
         '/edit': Edit,
         '/edit/:id': Edit
     })
+
+    // If the user switches away, we should lock the password database
+    let lockingTimeout = null
+
+    // Lock the database if we're hidden for over 20 seconds
+    document.addEventListener('visibilitychange', () => {
+        if(document.hidden) {
+            if(lockingTimeout !== null) { return }
+
+            lockingTimeout = window.setTimeout(() => {
+                SecureStorage.theSecureStorage.lock()
+                lockingTimeout = null
+            }, 10 * 1000)
+        } else {
+            if(lockingTimeout !== null) {
+                window.clearTimeout(lockingTimeout)
+            }
+        }
+    })
+
+    SecureStorage.theSecureStorage.onlock = () => {
+        m.route('/login')
+    }
 })

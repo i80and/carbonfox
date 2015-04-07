@@ -2,6 +2,7 @@ import * as SecureStorage from './SecureStorage.js'
 
 class ViewModel {
     constructor() {
+        this.hidden = false
         this.entries = []
 
         for(let kv of SecureStorage.theSecureStorage.cache) {
@@ -39,6 +40,14 @@ class ViewModel {
 
 var vm = null
 
+document.addEventListener('visibilitychange', () => {
+    if(vm === null) { return }
+
+    m.startComputation()
+    vm.hidden = document.hidden
+    m.endComputation()
+})
+
 export const view = function() {
     return m('div#view', [
         m('div#title', 'Carbon Fox'),
@@ -51,6 +60,7 @@ export const view = function() {
 
             m('ul#entry-list', vm.entries.map((entry) => {
                 return m('li', {
+                    style: vm.hidden? {visibility: 'hidden'} : {},
                     onclick: () => vm.show(entry),
                     oncontextmenu: (ev) => {
                         ev.preventDefault()
