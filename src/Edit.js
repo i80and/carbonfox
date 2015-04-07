@@ -2,6 +2,8 @@ import * as SecureStorage from './SecureStorage.js'
 import * as Floater from './Floater.js'
 import * as GeneratorDict from './GeneratorDict.js'
 
+let _ = document.webL10n.get
+
 class ViewModel {
     constructor(id) {
         this.editingEntry = null
@@ -46,11 +48,11 @@ class ViewModel {
 
         if(window.confirm('Are you sure you want to delete this password?')) {
             SecureStorage.theSecureStorage.delete(this.editingEntry).then(() => {
-                Floater.message('Deleted!')
+                Floater.message(_('%deleted'))
                 m.route('/view')
             }, (err) => {
                 console.error(err)
-                Floater.message('Error deleting')
+                Floater.message(_('%error-deleting'))
             })
         }
     }
@@ -79,14 +81,14 @@ class ViewModel {
         const entry = makeEntry()
 
         SecureStorage.theSecureStorage.save(entry).then(() => {
-            Floater.message('Saved!')
+            Floater.message(_('%saved'))
             m.route('/view')
         }).catch((err) => {
             console.error(err)
             if(err.name === 'conflict') {
-                Floater.message('Already exists')
+                Floater.message(_('%already-exists'))
             } else if(err.name !== undefined) {
-                Floater.message(`Error: ${err.name}`)
+                Floater.message(`${_('%error')}: ${err.name}`)
             }
         })
     }
@@ -96,25 +98,28 @@ let vm = null
 
 export const view = function() {
     return m('div#view', [
-        m('div#title', 'Password'),
+        m('div#title', _('%edit-title')),
         m('section#add-password-pane', [
             m('input[type="text"]', {
-                placeholder: '(website)',
+                placeholder: _('%placeholder-website'),
                 onchange: m.withAttr('value', vm.domain), value: vm.domain()}),
             m('input[type="text"]', {
-                placeholder: '(username)',
+                placeholder: _('%placeholder-username'),
                 onchange: m.withAttr('value', vm.username),
                 value: vm.username()}),
             m('textarea', {
                 rows: 3,
                 wrap: 'hard',
-                placeholder: '(password)',
+                placeholder: _('%placeholder-password'),
                 onchange: m.withAttr('value', vm.password),
                 value: vm.password()}),
-            m('button', {onclick: () => vm.generate()}, 'Generate'),
-            m('button', {onclick: () => vm.cancel()}, 'Cancel'),
-            (vm.editingEntry === null)? null : m('button.danger', {onclick: () => vm.delete()}, 'Delete'),
-            m('button.recommend', {onclick: () => vm.save()}, 'Save'),
+            m('button', {onclick: () => vm.generate()}, _('%generate')),
+            m('button', {onclick: () => vm.cancel()}, _('%cancel')),
+            (vm.editingEntry === null)?
+                null
+                : m('button.danger', {
+                    onclick: () => vm.delete()}, _('%delete')),
+            m('button.recommend', {onclick: () => vm.save()}, _('%save')),
         ])
     ])
 }

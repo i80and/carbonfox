@@ -1,11 +1,14 @@
+let _ = document.webL10n.get
+
 export const view = function() {
     return m('div#view', [
-        m('div#title', 'Welcome'),
+        m('div#title', _('%welcome-title')),
         m('section#welcomePane', [
-        m('h1', 'Welcome to Carbon Fox!'),
-        m('p', 'This is an early-stage prototype, but we encourage you to try it out!'),
-        m('p', 'First you will set up a PIN to secure your passwords against casual thieves.'),
-        m('a.bb-button.recommend', {href: '?/login'}, 'Get Started!')])
+            m('h1', _('%welcome-welcome')),
+            m('p', _('%welcome-para-early')),
+            m('p', _('%welcome-para-setup-pin')),
+            m('a.bb-button.recommend', {href: '?/login'}, _('%get-started'))
+        ])
     ])
 }
 

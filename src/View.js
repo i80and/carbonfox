@@ -1,5 +1,7 @@
 import * as SecureStorage from './SecureStorage.js'
 
+let _ = document.webL10n.get
+
 class ViewModel {
     constructor() {
         this.hidden = false
@@ -50,7 +52,7 @@ document.addEventListener('visibilitychange', () => {
 
 export const view = function() {
     return m('div#view', [
-        m('div#title', 'Carbon Fox'),
+        m('div#title', _('%view-title')),
         m('section#passwordPane', [
             m('div#search-bar', [
                 m('ul', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#'.split('').map((letter) => {

@@ -9,6 +9,7 @@ all: build/js/app.min.js
 	install src/crypto_worker.js build/js/
 	rsync -ra --delete style/ build/style
 	rsync -ra --delete dicts/ build/dicts
+	rsync -ra --delete locales/ build/locales
 	cp index.html build/
 	cp manifest.webapp build/
 

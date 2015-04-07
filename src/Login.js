@@ -1,6 +1,8 @@
 import * as SecureStorage from './SecureStorage.js'
 import * as Floater from './Floater.js'
 
+let _ = document.webL10n.get
+
 let pinDisplayList = []
 let pinList = []
 let isBusy = false
@@ -45,7 +47,7 @@ class ViewModel {
 
         if(pinList.length === 0) { return }
         if(isStupidPassword(pinList)) {
-            Floater.message('PIN too simple')
+            Floater.message(_('%simple-pin'))
             this.clear()
             return
         }
@@ -58,7 +60,7 @@ class ViewModel {
             console.error(err)
             let message = err.message
             if(err.name === 'BadSignature') {
-                message = 'Incorrect PIN'
+                message = _('%bad-pin')
             }
 
             Floater.message(message)
@@ -73,10 +75,10 @@ let vm = null
 
 export const view = function() {
     return m('div#view', [
-        m('div#title', 'Carbon Fox'),
+        m('div#title', _('%login-title')),
         m('section#loginPane', [
         m('div#lock-pane-input', {class: (pinDisplayList.length === 0)? 'empty' : ''},
-            pinDisplayList.join(' ') || (isBusy ? 'Checking your PIN...' : 'Enter PIN')),
+            pinDisplayList.join(' ') || (isBusy ? _('%checking-pin') : _('%enter-pin'))),
         m('a#login-button.fa.fa-unlock.round-button', {
             class: isBusy? 'fa-spin' : '',
             onclick: () => vm.login()}),
@@ -120,7 +122,7 @@ export const view = function() {
                     m('div', 0), m('div', m.trust('&#160;'))
                 ]),
                 m('a', {onclick: () => vm.backspace()}, [
-                    m('div.backspace', 'Bkspace'), m('div', m.trust('&#160;'))
+                    m('div.backspace', _('%backspace')), m('div', m.trust('&#160;'))
                 ]),
             ]),
         ])])

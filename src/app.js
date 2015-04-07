@@ -7,7 +7,7 @@ import * as Login from './Login.js'
 import * as View from './View.js'
 import * as Edit from './Edit.js'
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('localized', () => {
     window.reset = () => {
         window.localStorage.clear()
         SecureStorage.theSecureStorage.db.destroy()
