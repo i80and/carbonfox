@@ -113,6 +113,7 @@ export const view = function() {
                 placeholder: _('%placeholder-password'),
                 onchange: m.withAttr('value', vm.password),
                 value: vm.password()}),
+            m('div.vspacer'),
             m('button', {onclick: () => vm.generate()}, _('%generate')),
             m('button', {onclick: () => vm.cancel()}, _('%cancel')),
             (vm.editingEntry === null)?

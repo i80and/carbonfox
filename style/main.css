@@ -66,7 +66,9 @@ p.micro {
 }
 
 input, button {
-    border-radius: 2px;
+    border-radius: 0px;
+    border: none;
+    background-color: white;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     width: 100%;
@@ -79,8 +81,26 @@ input, button {
     text-overflow: ellipsis;
 }
 
+input::-moz-placeholder,textarea::-moz-placeholder {
+    text-align: center;
+}
+
+::-webkit-input-placeholder {
+    text-align: center;
+}
+
+#add-password-pane > textarea::-moz-placeholder {
+    line-height: 42px; /* Properly center placeholder */
+}
+
+#add-password-pane > textarea {
+    resize: none;
+}
+
 textarea {
-    border-radius: 2px;
+    border-radius: 0px;
+    border: none;
+    background-color: white;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     width: 100%;
@@ -120,6 +140,7 @@ body .round-button {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    color: black;
 
     transition: box-shadow 0.2s ease, transform 0.2s ease, background-color 0.4s ease;
 }
@@ -149,7 +170,31 @@ body .round-button {
     min-height: 100%;
     width: 100%;
     position: absolute;
+    padding: 0px;
     padding-top: 38px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
+
+    background-image: url('/style/images/footer_lodyas/footer_lodyas.png');
+    color: lightgray;
+}
+
+.vspacer {
+    min-height: 4rem;
+    flex: 1;
+}
+
+#add-password-pane {
+    display: flex;
+    flex-direction: column;
+}
+
+.textblock {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+#welcome-pane {
+    display: flex;
+    flex-direction: column;
 }
