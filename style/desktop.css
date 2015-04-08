@@ -1,0 +1,36 @@
+/* Temporary hack */
+@media (min-width: 800px) {
+    button, .bb-button, .button {
+        width: 20rem;
+    }
+
+    .vspacer {
+        height: 20px;
+        flex: 0;
+    }
+
+    #title { display: none ;}
+
+    #welcome-pane {
+        width: 800px;
+    }
+
+    #welcome-pane > .bb-button {
+        margin-left: 8rem;
+    }
+
+    #keypad {
+        display: none !important;
+    }
+
+    #view > #loginPane {
+        position: relative;
+        margin-left: auto;
+        margin-right: auto;
+        width: 800px;
+    }
+
+    input, textarea {
+        width: 40rem;
+    }
+}

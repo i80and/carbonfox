@@ -3,10 +3,6 @@ import * as Floater from './Floater.js'
 
 let _ = document.webL10n.get
 
-let pinDisplayList = []
-let pinList = []
-let isBusy = false
-
 // A few super-trivial checks for horrible PINs
 function isStupidPassword(passwordList) {
     if(passwordList.length <= 3) {
@@ -27,35 +23,52 @@ function isStupidPassword(passwordList) {
 }
 
 class ViewModel {
+    constructor() {
+        this.keypadMode = m.prop(true)
+        this.isBusy = m.prop(false)
+        this.pinDisplayList = []
+        this.pinList = []
+    }
+
     input(value) {
-        pinDisplayList.push('•')
-        pinList.push(value)
+        if(!this.keypadMode()) {
+            this.pinDisplayList = value.split('')
+            this.pinList = value.split('')
+            return
+        }
+
+        this.pinDisplayList.push('•')
+        this.pinList.push(value)
     }
 
     backspace() {
-        pinDisplayList.pop()
-        pinList.pop()
+        if(!this.keypadMode()) { return }
+
+        this.pinDisplayList.pop()
+        this.pinList.pop()
     }
 
     clear() {
-        pinDisplayList = []
-        pinList = []
+        this.pinDisplayList = []
+        this.pinList = []
     }
 
     login() {
-        if(isBusy) { return }
+        if(this.isBusy()) { return }
 
-        if(pinList.length === 0) { return }
-        if(isStupidPassword(pinList)) {
+        if(this.pinList.length === 0) { return }
+        if(isStupidPassword(this.pinList)) {
             Floater.message(_('%simple-pin'))
             this.clear()
             return
         }
 
-        isBusy = true
-        SecureStorage.theSecureStorage.unlock(pinList.join('')).then(() => {
-            isBusy = false
+        this.isBusy(true)
+        m.startComputation()
+        SecureStorage.theSecureStorage.unlock(this.pinList.join('')).then(() => {
+            this.isBusy(false)
             m.route('/view')
+            m.endComputation()
         }, (err) => {
             console.error(err)
             let message = err.message
@@ -64,10 +77,12 @@ class ViewModel {
             }
 
             Floater.message(message)
-            isBusy = false
+            this.isBusy(false)
+            m.endComputation()
         })
 
         this.clear()
+        m.redraw()
     }
 }
 
@@ -76,12 +91,30 @@ let vm = null
 export const view = function() {
     return m('div#view', [
         m('div#title', _('%login-title')),
-        m('section#loginPane', [
-        m('div#lock-pane-input', {class: (pinDisplayList.length === 0)? 'empty' : ''},
-            pinDisplayList.join(' ') || (isBusy ? _('%checking-pin') : _('%enter-pin'))),
-        m('a#login-button.fa.fa-unlock.round-button', {
-            class: isBusy? 'fa-spin' : '',
-            onclick: () => vm.login()}),
+        m('section#loginPane', {class: vm.keypadMode()? 'keypad' : ''}, [
+        m('form', [
+            m('input#lock-pane-input', {
+                    type: 'password',
+                    oninput: function() {
+                        if(!vm.keypadMode()) {
+                            vm.input(this.value)
+                        }
+                    },
+                    placeholder: (vm.isBusy()? _('%checking-pin') : _('%enter-pin')),
+                    class: (vm.pinDisplayList.length === 0)? 'empty' : '',
+                    value: vm.pinDisplayList.join('') || '',
+                    onfocus: () => {
+                        vm.keypadMode(false)
+                    }
+                }),
+            m('button#login-button.fa.fa-unlock.round-button', {
+                type: 'submit',
+                class: vm.isBusy()? 'fa-spin' : '',
+                onclick: () => {
+                    vm.login()
+                    return false
+                }}),
+        ]),
         m('div#keypad', [
             m('section', [
                 m('a', {onclick: vm.input.bind(vm, 1)}, [

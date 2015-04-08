@@ -14,7 +14,7 @@
     background-color: rgba(128, 128, 100, 0.5);
     box-shadow: 0px 0px 2px;
 
-    display: flex;
+    display: none;
     justify-content: center;
     flex-wrap: nowrap;
     align-items: center;
@@ -22,6 +22,16 @@
 
     /* Grow the keypad, but keep the title bar and entry pad fixed */
     flex: 1;
+}
+
+#loginPane.keypad #keypad {
+    display: flex;
+}
+
+#loginPane.keypad #lock-pane-input {
+    display: flex;
+    font-size: 2em;
+    color: black;
 }
 
 #keypad section {
@@ -63,7 +73,7 @@
     font-size: 1em;
 }
 
-#lock-pane-input {
+#loginPane #lock-pane-input {
     height: 75px;
     width: 100%;
     text-align: center;
@@ -75,9 +85,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    cursor: text;
 }
 
-#lock-pane-input.empty {
+#loginPane #lock-pane-input.empty {
     font-size: 1em;
     color: gray;
 }
