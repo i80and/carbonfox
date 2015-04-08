@@ -38,6 +38,34 @@ class ViewModel {
     edit(entry) {
         m.route(`/edit/${entry._id}`)
     }
+
+    // Scroll the view such that domains starting with a given letter are visible
+    scrollTo(letter) {
+        // Incredibly ugly hack that only works for ASCII characters and would be
+        // slow if there weren't only 27 possible characters.
+        const getPrevLetter = (letter) => {
+            if(letter === '#') { return 'Z' }
+            const codePoint = letter.codePointAt(0)
+            if(codePoint > 'Z'.codePointAt(0) || codePoint < 'A'.codePointAt(0)) {
+                return 'A'
+            }
+
+            return String.fromCodePoint(codePoint - 1)
+        }
+
+        const el = document.getElementById(`letter-${letter}`)
+        if(el === null) {
+            // Try the previous letter
+            if(letter !== 'A') {
+                return this.scrollTo(getPrevLetter(letter))
+            }
+
+            // No entries that we know how to index
+            return
+        }
+
+        el.scrollIntoView(false)
+    }
 }
 
 var vm = null
@@ -51,17 +79,42 @@ document.addEventListener('visibilitychange', () => {
 })
 
 export const view = function() {
+    // Create a list of entries with one per starting letter
+    let letterIndex = {}
+    let entryIndex = {}
+    for(let entry of vm.entries) {
+        if(entry.length === 0) { continue }
+
+        let letter = entry.domain[0].toUpperCase()
+        if(/[0-9]/.test(letter)) { letter = '#' }
+
+        if(letterIndex[letter] === undefined) {
+            letterIndex[letter] = entry
+            entryIndex[entry._id] = letter
+        }
+    }
+
+    const getIdForElement = (entry) => {
+        const letter = entryIndex[entry._id]
+        return (letter === undefined)?
+            `entry-${entry._id}` :
+            `letter-${entryIndex[entry._id]}`
+    }
+
     return m('div#view', [
         m('div#title', _('%view-title')),
         m('section#passwordPane', [
             m('div#search-bar', [
-                m('ul', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#'.split('').map((letter) => {
-                    return m('li', letter)
+                m('ul', '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((letter) => {
+                    return m('li', {
+                        onclick: () => vm.scrollTo(letter)
+                    }, letter)
                 }))
             ]),
 
             m('ul#entry-list', vm.entries.map((entry) => {
                 return m('li', {
+                    id: getIdForElement(entry),
                     style: vm.hidden? {visibility: 'hidden'} : {},
                     onclick: () => vm.show(entry),
                     oncontextmenu: (ev) => {
