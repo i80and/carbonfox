@@ -124,13 +124,17 @@ export function viewFactory(vm, options = {
                             vm.keypadMode(false)
                         }
                     }),
-                m(`button#login-button.fa.${options.goIcon}.round-button`, {
+                m(`button#login-button.round-button`, {
                     type: 'submit',
-                    class: vm.isBusy()? 'fa-spin' : '',
+                    class: vm.isBusy()? 'disabled' : '',
                     onclick: () => {
                         vm.go()
                         return false
-                    }}),
+                    }}, [
+                    m(`span.fa.${options.goIcon}`, {
+                        class: vm.isBusy()? 'fa-spin' : '',
+                    })
+                ]),
             ]),
             m('div#keypad', [
                 m('section', [

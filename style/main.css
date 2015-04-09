@@ -154,12 +154,12 @@ body .round-button {
     transition: box-shadow 0.2s ease, transform 0.2s ease, background-color 0.4s ease;
 }
 
-.round-button:not(.fa-spin):active {
+.round-button:not(.disabled):active {
     box-shadow: 0px 0px 1px black;
     transform: scale(0.95);
 }
 
-.round-button.fa-spin {
+.round-button.disabled {
     background-color: #eee;
     cursor: default;
 }
