@@ -201,6 +201,7 @@ body .round-button {
     right: 0px;
     padding-right: 20px;
     box-sizing: border-box;
+    -moz-box-sizing: border-box;
     height: 38px;
     border-top-left-radius: 20px;
     border-bottom-left-radius: 20px;
@@ -216,6 +217,7 @@ body .round-button {
 
 #sidebar {
     box-sizing: border-box;
+    -moz-box-sizing: border-box;
 
     padding: 0px;
     margin: 0px;
