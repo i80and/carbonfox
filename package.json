@@ -3,11 +3,11 @@
   "version": "0.0.0",
   "author": "Andrew Aldridge <i80and@foxquill.com>",
   "dependencies": {
-    "babel": "4.7.16",
-    "babelify": "5.0.4",
-    "browserify": "9.0.3",
+    "babel": "5.0.0",
+    "babelify": "6.0.2",
+    "browserify": "9.0.7",
     "jshint": "2.6.3",
-    "uglify-js": "2.4.10"
+    "uglify-js": "2.4.19"
   },
   "private": true,
   "webide": {
