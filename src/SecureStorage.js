@@ -102,9 +102,9 @@ export class SecureEntry {
 }
 
 // A database of password entries
-class SecureStorage {
-    constructor() {
-        this.db = new PouchDB('carbonfox')
+export class SecureStorage {
+    constructor(name) {
+        this.db = new PouchDB(name)
         this.idGenerator = new SequentialID()
         this.key = null
 
@@ -114,6 +114,10 @@ class SecureStorage {
 
     isSetup() {
         return localStorage.getItem('salt') !== null
+    }
+
+    destroy() {
+        this.db.destroy()
     }
 
     save(entry) {
@@ -202,6 +206,12 @@ class SecureStorage {
         })
     }
 
+    [Symbol.iterator]() {
+        return util.map(this.cache.values(), (entry) => {
+            return [entry, () => entry.unlock(this.key)]
+        })
+    }
+
     delete(entry) {
         if(entry._rev === undefined) {
             return new Promise((resolve, reject) =>
@@ -214,4 +224,15 @@ class SecureStorage {
     }
 }
 
-export const theSecureStorage = new SecureStorage()
+export let theSecureStorage = null
+
+export function init() {
+    let dbName = self.localStorage.getItem('dbName')
+
+    if(dbName === null) {
+        dbName = 'carbonfox'
+        self.localStorage.setItem('dbName', dbName)
+    }
+
+    theSecureStorage = new SecureStorage(dbName)
+}

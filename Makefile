@@ -1,6 +1,6 @@
 # Prohibit the for-of transformation; all versions of FirefoxOS that we target
 # support it, and the transformation requires a Symbol polyfill.
-TRANSFORM_BLACKLIST=es6.forOf
+TRANSFORM_BLACKLIST=es6.forOf,regenerator
 
 .PHONY: all check clean
 

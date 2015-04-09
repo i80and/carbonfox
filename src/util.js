@@ -31,3 +31,10 @@ export function error(name, message) {
         stack: (new Error()).stack
     }
 }
+
+// Map function for iterators
+export function* map(it, f) {
+    for(let x of it) {
+        yield f(x)
+    }
+}

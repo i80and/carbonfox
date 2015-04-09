@@ -22,7 +22,7 @@ function isStupidPassword(passwordList) {
     return isAllSame
 }
 
-class ViewModel {
+export class ViewModel {
     constructor() {
         this.keypadMode = m.prop(true)
         this.isBusy = m.prop(false)
@@ -53,7 +53,10 @@ class ViewModel {
         this.pinList = []
     }
 
-    login() {
+    // Entry point for checking a PIN; this method simply checks the PIN's
+    // quality, and then calls the login() method, which should be overridden
+    // by any consumers of this view model.
+    go() {
         if(this.isBusy()) { return }
 
         if(this.pinList.length === 0) { return }
@@ -63,6 +66,10 @@ class ViewModel {
             return
         }
 
+        this.login()
+    }
+
+    login() {
         this.isBusy(true)
         m.startComputation()
         SecureStorage.theSecureStorage.unlock(this.pinList.join('')).then(() => {
@@ -88,80 +95,92 @@ class ViewModel {
 
 let vm = null
 
-export const view = function() {
-    return m('div#view', [
-        m('div#title', _('%login-title')),
-        m('section#loginPane', {class: vm.keypadMode()? 'keypad' : ''}, [
-        m('form', [
-            m('input#lock-pane-input', {
-                    type: 'password',
-                    oninput: function() {
-                        if(!vm.keypadMode()) {
-                            vm.input(this.value)
-                        }
-                    },
-                    placeholder: (vm.isBusy()? _('%checking-pin') : _('%enter-pin')),
-                    class: (vm.pinDisplayList.length === 0)? 'empty' : '',
-                    value: vm.pinDisplayList.join('') || '',
-                    onfocus: () => {
-                        vm.keypadMode(false)
-                    }
+export function viewFactory(vm, options = {
+        goIcon: 'fa-unlock',
+        oncancel: null
+    }) {
+    return function() {
+        return m('div#view', [
+            m('div#title', _('%login-title')),
+            m('section#loginPane', {class: vm.keypadMode()? 'keypad' : ''}, [
+            m('form', [
+                m('button#cancel.fa.fa-chevron-left', {
+                    style: {display: options.oncancel === null? 'none' : 'unset'},
+                    onclick: options.oncancel
                 }),
-            m('button#login-button.fa.fa-unlock.round-button', {
-                type: 'submit',
-                class: vm.isBusy()? 'fa-spin' : '',
-                onclick: () => {
-                    vm.login()
-                    return false
-                }}),
-        ]),
-        m('div#keypad', [
-            m('section', [
-                m('a', {onclick: vm.input.bind(vm, 1)}, [
-                    m('div', 1), m('div', m.trust('&#160;'))
-                ]),
-                m('a', {onclick: vm.input.bind(vm, 2)}, [
-                    m('div', 2), m('div', 'abc')
-                ]),
-                m('a', {onclick: vm.input.bind(vm, 3)}, [
-                    m('div', 3), m('div', 'def')
-                ]),
+                m('input#lock-pane-input', {
+                        type: 'password',
+                        oninput: function() {
+                            if(!vm.keypadMode()) {
+                                vm.input(this.value)
+                            }
+                        },
+                        placeholder: (vm.isBusy()? _('%checking-pin') : _('%enter-pin')),
+                        class: (vm.pinDisplayList.length === 0)? 'empty' : '',
+                        value: vm.pinDisplayList.join('') || '',
+                        onfocus: () => {
+                            vm.keypadMode(false)
+                        }
+                    }),
+                m(`button#login-button.fa.${options.goIcon}.round-button`, {
+                    type: 'submit',
+                    class: vm.isBusy()? 'fa-spin' : '',
+                    onclick: () => {
+                        vm.go()
+                        return false
+                    }}),
             ]),
-            m('section', [
-                m('a', {onclick: vm.input.bind(vm, 4)}, [
-                    m('div', 4), m('div', 'ghi')
+            m('div#keypad', [
+                m('section', [
+                    m('a', {onclick: vm.input.bind(vm, 1)}, [
+                        m('div', 1), m('div', m.trust('&#160;'))
+                    ]),
+                    m('a', {onclick: vm.input.bind(vm, 2)}, [
+                        m('div', 2), m('div', 'abc')
+                    ]),
+                    m('a', {onclick: vm.input.bind(vm, 3)}, [
+                        m('div', 3), m('div', 'def')
+                    ]),
                 ]),
-                m('a', {onclick: vm.input.bind(vm, 5)}, [
-                    m('div', 5), m('div', 'jkl')
+                m('section', [
+                    m('a', {onclick: vm.input.bind(vm, 4)}, [
+                        m('div', 4), m('div', 'ghi')
+                    ]),
+                    m('a', {onclick: vm.input.bind(vm, 5)}, [
+                        m('div', 5), m('div', 'jkl')
+                    ]),
+                    m('a', {onclick: vm.input.bind(vm, 6)}, [
+                        m('div', 6), m('div', 'mno')
+                    ]),
                 ]),
-                m('a', {onclick: vm.input.bind(vm, 6)}, [
-                    m('div', 6), m('div', 'mno')
+                m('section', [
+                    m('a', {onclick: vm.input.bind(vm, 7)}, [
+                        m('div', 7), m('div', 'pqr')
+                    ]),
+                    m('a', {onclick: vm.input.bind(vm, 8)}, [
+                        m('div', 8), m('div', 'tuv')
+                    ]),
+                    m('a', {onclick: vm.input.bind(vm, 9)}, [
+                        m('div', 9), m('div', 'wxyz')
+                    ]),
                 ]),
-            ]),
-            m('section', [
-                m('a', {onclick: vm.input.bind(vm, 7)}, [
-                    m('div', 7), m('div', 'pqr')
+                m('section', [
+                    m('a'),
+                    m('a', {onclick: vm.input.bind(vm, 0)}, [
+                        m('div', 0), m('div', m.trust('&#160;'))
+                    ]),
+                    m('a', {onclick: () => vm.backspace()}, [
+                        m('div.backspace', _('%backspace')), m('div', m.trust('&#160;'))
+                    ]),
                 ]),
-                m('a', {onclick: vm.input.bind(vm, 8)}, [
-                    m('div', 8), m('div', 'tuv')
-                ]),
-                m('a', {onclick: vm.input.bind(vm, 9)}, [
-                    m('div', 9), m('div', 'wxyz')
-                ]),
-            ]),
-            m('section', [
-                m('a'),
-                m('a', {onclick: vm.input.bind(vm, 0)}, [
-                    m('div', 0), m('div', m.trust('&#160;'))
-                ]),
-                m('a', {onclick: () => vm.backspace()}, [
-                    m('div.backspace', _('%backspace')), m('div', m.trust('&#160;'))
-                ]),
-            ]),
-        ])])
-    ])
+            ])])
+        ])
+    }
 }
+
+export let view = null
 
 export const controller = function() {
     vm = new ViewModel()
+    view = viewFactory(vm)
 }

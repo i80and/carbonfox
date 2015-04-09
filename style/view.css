@@ -96,3 +96,10 @@
 #search-bar > ul > li:hover {
     color: #fff;
 }
+
+@media(max-height: 400px) {
+    /* The search bar just gets too squished */
+    #search-bar {
+        visibility: hidden;
+    }
+}

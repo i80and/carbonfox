@@ -193,3 +193,80 @@ body .round-button {
     display: flex;
     flex-direction: column;
 }
+
+#settings-icon {
+    position: absolute;
+    padding: 10px;
+    top: 0px;
+    right: 0px;
+    padding-right: 20px;
+    box-sizing: border-box;
+    height: 38px;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    background-color: lightgray;
+    transition: background-color 0.25s ease;
+
+    cursor: pointer;
+}
+
+#settings-icon:active, #settings-icon.open {
+    background-color: white;
+}
+
+#sidebar {
+    box-sizing: border-box;
+
+    padding: 0px;
+    margin: 0px;
+    background-image: linear-gradient(135deg, rgba(80,80,80,1.0) 0%,rgba(119,119,119,0.95) 50%,rgba(115,115,115,0.95) 51%,rgba(154,154,154,0.95) 100%);
+    position: fixed;
+    width: 200px;
+    height: 100%;
+    right: -205px;
+    top: 38px;
+    box-shadow: 0px 0px 2px black;
+
+    transition: right 0.25s ease;
+}
+
+#sidebar.open {
+    right: 0px;
+}
+
+#sidebar > li {
+    cursor: pointer;
+    list-style-type: none;
+    color: white;
+    font-size: 1.5rem;
+    padding: 10px;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+}
+
+#sidebar > li:active {
+    background-color: rgba(95,95,128,0.5)
+}
+
+#sidebar > li > a {
+    color: unset;
+    text-decoration: none
+}
+
+#sidebar > li > span.fa {
+    margin: 2rem;
+    font-size: 2rem;
+    width: 25px;
+}
+
+#cancel {
+    position: absolute;
+    height: 75px;
+    width: 30px;
+    background-color: white;
+    left: 0px;
+    padding-left: 10px;
+    border-right: 1px solid black;
+    cursor: pointer;
+}

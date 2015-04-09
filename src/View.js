@@ -6,9 +6,10 @@ class ViewModel {
     constructor() {
         this.hidden = false
         this.entries = []
+        this.menuVisible = m.prop(false)
 
-        for(let kv of SecureStorage.theSecureStorage.cache) {
-            const entry = kv[1]
+        for(let kv of SecureStorage.theSecureStorage) {
+            const entry = kv[0]
             this.entries.push(entry)
         }
 
@@ -66,6 +67,16 @@ class ViewModel {
 
         el.scrollIntoView(false)
     }
+
+    toggleMenu() {
+        this.menuVisible(!this.menuVisible())
+    }
+
+    changePIN() {
+        if(window.confirm(_('%change-pin-confirm'))) {
+            m.route('/changepin')
+        }
+    }
 }
 
 var vm = null
@@ -102,7 +113,13 @@ export const view = function() {
     }
 
     return m('div#view', [
-        m('div#title', _('%view-title')),
+        m('div#title', [
+            m('span', _('%view-title')),
+            m('span#settings-icon.fa.fa-gear', {
+                onclick: () => vm.toggleMenu(),
+                class: vm.menuVisible()? 'open' : ''
+            })
+        ]),
         m('section#passwordPane', [
             m('div#search-bar', [
                 m('ul', '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((letter) => {
@@ -132,6 +149,16 @@ export const view = function() {
             })),
 
             m('a#add-button.round-button.fa.fa-plus', {onclick: () => vm.add()})
+        ]),
+        m('ul#sidebar', {
+            class: vm.menuVisible()? 'open' : ''
+        }, [
+            m('li', {onclick: () => vm.changePIN()}, [
+                m('span.fa.fa-key'),
+                _('%change-pin')]),
+            m('li', [
+                m('span.fa.fa-question'),
+                m('a', {href: '?/about'}, _('%about'))])
         ])
     ])
 }
