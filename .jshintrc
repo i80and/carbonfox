@@ -17,6 +17,7 @@
     "maxdepth": 5,
     "maxcomplexity": "10",
     "maxlen": 120,
+    "multistr": true,
 
     "asi": true,
 

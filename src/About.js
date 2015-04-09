@@ -1,3 +1,5 @@
+import * as DetailsComponent from './DetailsComponent.js'
+
 let _ = document.webL10n.get
 
 export const view = function() {
@@ -6,6 +8,8 @@ export const view = function() {
         m('section#welcome-pane', [
             m('section.textblock', [
                 m('h1', 'Carbon Fox'),
+                m('h2', 'Details'),
+                DetailsComponent.getDetailsComponent()
             ]),
             m('div.vspacer'),
             m('a.bb-button.recommend', {

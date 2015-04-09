@@ -185,6 +185,7 @@ body .round-button {
 }
 
 .textblock {
+    max-width: 40em;
     padding-left: 1rem;
     padding-right: 1rem;
 }

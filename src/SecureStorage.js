@@ -1,6 +1,8 @@
 import * as util from './util.js'
 import * as CryptoTools from './CryptoTools.js'
 
+export const timeFactor = 16
+
 // A semi-random ID generator that creates extents of strictly increasing
 // values. Designed to create well-balanced and efficient CouchDB B-Trees.
 class SequentialID {
