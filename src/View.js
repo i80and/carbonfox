@@ -8,7 +8,7 @@ class ViewModel {
         this.entries = []
         this.menuVisible = m.prop(false)
 
-        for(let kv of SecureStorage.theSecureStorage) {
+        for(let kv of SecureStorage.theSecureStorage.iterate()) {
             const entry = kv[0]
             this.entries.push(entry)
         }
