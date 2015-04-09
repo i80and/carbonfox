@@ -1,4 +1,4 @@
-#view > #loginPane {
+#view > #login-pane {
     height: 100%; /* Override the normal min-height, to keep this view from scrolling */
     display: flex;
     flex-direction: column;
@@ -24,11 +24,11 @@
     flex: 1;
 }
 
-#loginPane.keypad #keypad {
+#login-pane.keypad #keypad {
     display: flex;
 }
 
-#loginPane.keypad #lock-pane-input {
+#login-pane.keypad #lock-pane-input {
     display: flex;
     font-size: 2em;
     color: black;
@@ -73,7 +73,7 @@
     font-size: 1em;
 }
 
-#loginPane #lock-pane-input {
+#login-pane #lock-pane-input {
     height: 75px;
     width: 100%;
     text-align: center;
@@ -88,12 +88,12 @@
     cursor: text;
 }
 
-#loginPane #lock-pane-input.empty {
+#login-pane #lock-pane-input.empty {
     font-size: 1em;
     color: gray;
 }
 
-#loginPane #login-button {
+#login-pane #login-button {
     position: absolute;
     right: 10px;
     top: 50px;

@@ -102,7 +102,7 @@ export function viewFactory(vm, options = {
     return function() {
         return m('div#view', [
             m('div#title', _('%login-title')),
-            m('section#loginPane', {class: vm.keypadMode()? 'keypad' : ''}, [
+            m('section#login-pane', {class: vm.keypadMode()? 'keypad' : ''}, [
             m('form', [
                 m('button#cancel.fa.fa-chevron-left', {
                     style: {display: options.oncancel === null? 'none' : 'unset'},
