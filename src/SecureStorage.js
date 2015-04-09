@@ -1,5 +1,6 @@
 import * as util from './util.js'
 import * as CryptoTools from './CryptoTools.js'
+import * as Totp from './Totp.js'
 
 export const timeFactor = 16
 
@@ -29,6 +30,41 @@ class SequentialID {
     }
 }
 
+// Additional information needed for time-based authentication
+export class TotpEntry {
+    constructor(options) {
+        this.secret = options.secret
+        this.timestep = options.timestep || 30000
+        this.hash = options.hash || 'sha1'
+        this.digits = options.digits || 6
+    }
+
+    static fromDocument(doc) {
+        return new TotpEntry(doc)
+    }
+
+    get() {
+        return Totp.totp(this.secret, 0, new Date(), this.timestep, {
+            hash: this.hash,
+            digits: this.digits
+        })
+    }
+
+    // Returns a Promise that resolves when the next refresh interval passes
+    nextRefresh() {
+        // First decide how long to wait, based on even intervals
+        const now = new Date().valueOf()
+        const prev = Math.floor(now / this.timestep) * this.timestep
+        const next = prev  + this.timestep
+
+        return new Promise((resolve) => {
+            self.setTimeout(() => {
+                return resolve(this)
+            }, next - now)
+        })
+    }
+}
+
 // A single password database entry. The password field is kept encrypted
 // even after a SecureEntry is returned.
 export class SecureEntry {
@@ -39,6 +75,8 @@ export class SecureEntry {
         this.cipherPassword = options.cipherPassword || null
         this.salt = options.salt || null
         this.comment = options.comment || ''
+
+        this.totp = (options.totp)? TotpEntry.fromDocument(options.totp) : null
 
         this._id = options._id || undefined
         this._rev = options._rev || undefined
@@ -98,8 +136,8 @@ export class SecureEntry {
         })
     }
 
-    getID() {
-        return this.domain + ':' + this.username
+    haveTotp() {
+        return this.totp !== null
     }
 }
 

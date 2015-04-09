@@ -7,6 +7,7 @@ class ViewModel {
         this.hidden = false
         this.entries = []
         this.menuVisible = m.prop(false)
+        this.totpMode = m.prop(false)
 
         for(let kv of SecureStorage.theSecureStorage.iterate()) {
             const entry = kv[0]
@@ -77,6 +78,11 @@ class ViewModel {
             m.route('/changepin')
         }
     }
+
+    toggleTotp() {
+        this.totpMode(!this.totpMode())
+        this.menuVisible(false)
+    }
 }
 
 var vm = null
@@ -129,7 +135,9 @@ export const view = function() {
                 }))
             ]),
 
-            m('ul#entry-list', vm.entries.map((entry) => {
+            m('ul#entry-list', vm.entries.filter((entry) => {
+                return entry.haveTotp() === vm.totpMode()
+            }).map((entry) => {
                 return m('li', {
                     id: getIdForElement(entry),
                     style: vm.hidden? {visibility: 'hidden'} : {},
@@ -153,8 +161,8 @@ export const view = function() {
         m('ul#sidebar', {
             class: vm.menuVisible()? 'open' : ''
         }, [
-            m('li', [
-                m('span.fa.fa-toggle-off'),
+            m('li', {onclick: () => vm.toggleTotp()}, [
+                m('span.fa', {class: vm.totpMode()? 'fa-toggle-on' : 'fa-toggle-off'}),
                 m('span', 'Time-based Authenticator')]),
             m('li.spacer'),
             m('li', {onclick: () => vm.changePIN()}, [
