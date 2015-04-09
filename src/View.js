@@ -115,7 +115,7 @@ export const view = function() {
     return m('div#view', [
         m('div#title', [
             m('span', _('%view-title')),
-            m('span#settings-icon.fa.fa-gear', {
+            m('span#settings-icon.title-button.right.fa.fa-gear', {
                 onclick: () => vm.toggleMenu(),
                 class: vm.menuVisible()? 'open' : ''
             })

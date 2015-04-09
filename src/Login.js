@@ -101,13 +101,15 @@ export function viewFactory(vm, options = {
     }) {
     return function() {
         return m('div#view', [
-            m('div#title', _('%login-title')),
-            m('section#login-pane', {class: vm.keypadMode()? 'keypad' : ''}, [
-            m('form', [
-                m('button#cancel.fa.fa-chevron-left', {
-                    style: {display: options.oncancel === null? 'none' : 'unset'},
+            m('div#title', [
+                m('span.fa.fa-chevron-left.title-button.left', {
+                    style: {display: options.oncancel === null? 'none' : 'flex'},
                     onclick: options.oncancel
                 }),
+                m('span', _('%login-title'))
+            ]),
+            m('section#login-pane', {class: vm.keypadMode()? 'keypad' : ''}, [
+            m('form', [
                 m('input#lock-pane-input', {
                         type: 'password',
                         oninput: function() {

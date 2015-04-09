@@ -78,10 +78,10 @@
 #search-bar > ul {
     display: flex;
     flex-direction: column;
-    top: 38px;
+    top: 45px;
     margin-top: 10px;
     padding: 0px;
-    height: calc(100% - 38px - 10px);
+    height: calc(100% - 45px - 10px);
 }
 
 #search-bar > ul > li {

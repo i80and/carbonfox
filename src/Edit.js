@@ -98,7 +98,11 @@ let vm = null
 
 export const view = function() {
     return m('div#view', [
-        m('div#title', _('%edit-title')),
+        m('div#title', [
+            m('span.fa.fa-chevron-left.title-button.left', {onclick: () => vm.cancel()}),
+            m('span', _('%edit-title')),
+            m('span.fa.fa-check.title-button.right', {onclick: () => vm.save()}),
+        ]),
         m('section#add-password-pane', [
             m('input[type="text"]', {
                 placeholder: _('%placeholder-website'),
@@ -115,12 +119,10 @@ export const view = function() {
                 value: vm.password()}),
             m('div.vspacer'),
             m('button', {onclick: () => vm.generate()}, _('%generate')),
-            m('button', {onclick: () => vm.cancel()}, _('%cancel')),
             (vm.editingEntry === null)?
                 null
                 : m('button.danger', {
-                    onclick: () => vm.delete()}, _('%delete')),
-            m('button.recommend', {onclick: () => vm.save()}, _('%save')),
+                    onclick: () => vm.delete()}, _('%delete'))
         ])
     ])
 }
