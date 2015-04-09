@@ -247,17 +247,17 @@ body .round-button {
     margin: 0px;
     background-image: linear-gradient(135deg, rgba(80,80,80,1.0) 0%,rgba(119,119,119,0.95) 50%,rgba(115,115,115,0.95) 51%,rgba(154,154,154,0.95) 100%);
     position: fixed;
-    width: 200px;
+    width: 100%;
     height: 100%;
-    right: -205px;
-    top: 45px;
+    right: -100%;
+    top: 38px;
     box-shadow: 0px 0px 2px black;
 
     transition: right 0.25s ease;
 }
 
 #sidebar.open {
-    right: 0px;
+    right: calc(-100% + 215px);
 }
 
 #sidebar > li {
@@ -269,6 +269,8 @@ body .round-button {
     margin-bottom: 5px;
     display: flex;
     align-items: center;
+
+    width: 200px;
 }
 
 #sidebar > li:hover {
@@ -287,4 +289,31 @@ body .round-button {
 
 #title .fa-check {
     background-color: lightblue;
+}
+
+li.spacer {
+    min-height: 4rem;
+    visibility: hidden;
+}
+
+/* Optimize the menu for portrait mode */
+@media (max-height: 400px) {
+    #sidebar {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        right: -100%;
+    }
+
+    #sidebar.open {
+        right: 0px;
+    }
+
+    #sidebar > li {
+        height: 80px;
+    }
+
+    #sidebar > li.spacer {
+        display: none;
+    }
 }

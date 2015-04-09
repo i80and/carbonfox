@@ -153,6 +153,10 @@ export const view = function() {
         m('ul#sidebar', {
             class: vm.menuVisible()? 'open' : ''
         }, [
+            m('li', [
+                m('span.fa.fa-toggle-off'),
+                m('span', 'Time-based Authenticator')]),
+            m('li.spacer'),
             m('li', {onclick: () => vm.changePIN()}, [
                 m('span.fa.fa-key'),
                 _('%change-pin')]),
