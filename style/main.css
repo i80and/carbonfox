@@ -206,13 +206,14 @@ body .round-button {
     border-top-left-radius: 20px;
     border-bottom-left-radius: 20px;
     background-color: lightgray;
-    transition: background-color 0.25s ease;
+    transition: background-color 0.25s ease, padding-right 0.25s ease;
 
     cursor: pointer;
 }
 
 #settings-icon:active, #settings-icon.open {
     background-color: white;
+    padding-right: 50px;
 }
 
 #sidebar {
@@ -247,13 +248,12 @@ body .round-button {
     align-items: center;
 }
 
-#sidebar > li:active {
-    background-color: rgba(95,95,128,0.5)
+#sidebar > li:hover {
+    background-color: rgba(95,95,128,0.25)
 }
 
-#sidebar > li > a {
-    color: unset;
-    text-decoration: none
+#sidebar > li:active {
+    background-color: rgba(95,95,128,0.5)
 }
 
 #sidebar > li > span.fa {

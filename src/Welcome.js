@@ -10,7 +10,7 @@ export const view = function() {
                 m('p', _('%welcome-para-setup-pin')),
             ]),
             m('div.vspacer'),
-            m('a.bb-button.recommend', {href: '?/login'}, _('%get-started'))
+            m('button.recommend', {onclick: () => m.route('/login')}, _('%get-started'))
         ])
     ])
 }

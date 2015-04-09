@@ -156,9 +156,9 @@ export const view = function() {
             m('li', {onclick: () => vm.changePIN()}, [
                 m('span.fa.fa-key'),
                 _('%change-pin')]),
-            m('li', [
+            m('li', {onclick: () => m.route('/about')}, [
                 m('span.fa.fa-question'),
-                m('a', {href: '?/about'}, _('%about'))])
+                _('%about')])
         ])
     ])
 }
