@@ -1,19 +1,11 @@
-function hotp(secretKey, counter, options) {
+function hotp(secretKey, counter, options={
+        digits: 6,
+        hash: 'sha1',
+    }) {
     // See RFC-4226
 
-    if(options === undefined) {
-        options = {}
-    }
-
-    let digits = options.digits
-    if(digits === undefined) {
-        digits = 6
-    }
-
+    const digits = options.digits
     let hash = options.hash
-    if(hash === undefined) {
-        hash = 'sha1'
-    }
 
     if(hash === 'sha1') {
         hash = triplesec.hash.SHA1
