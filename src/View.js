@@ -67,9 +67,12 @@ class ViewModel {
         // Start our TOTP interval timers
         for(let [t,v] of this.refreshIntervals) {
             v[0].totp.nextRefresh().then(() => {
-                // XXX
+                console.log('Refresh!', v[0].totp.get())
+                m.redraw()
+
                 self.setInterval(() => {
-                    // XXX
+                    m.redraw()
+                    console.log('Refresh!', v[0].totp.get())
                 }, t)
             })
         }

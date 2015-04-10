@@ -1,3 +1,12 @@
+function derive(counter) {
+    const bytes = []
+    for(let i = 0; i < 8; i += 1) {
+        bytes.push(counter & 0xff)
+        counter >>= 8
+    }
+    return triplesec.WordArray.from_ui8a(bytes.reverse())
+}
+
 function hotp(secretKey, counter, options={
         digits: 6,
         hash: 'sha1',
@@ -18,7 +27,7 @@ function hotp(secretKey, counter, options={
     }
 
     // Convert our integer counter into a word array.
-    const counterBitArray = new triplesec.WordArray([counter])
+    const counterBitArray = derive(counter)
 
     // Compute the HMAC and convert it into a bytewise format easy for us to wrangle
     const rawhs = triplesec.hmac.sign({
@@ -46,10 +55,34 @@ function hotp(secretKey, counter, options={
     return d
 }
 
- export function totp(secretKey, startEpoch, now, timestep, options) {
+ export function totp(secretKey, startEpoch, now, timestepMs, options) {
     // See RFC-6238
 
     now = now.valueOf() / 1000
-    const timeCounter = Math.floor((now - startEpoch) / timestep)
+    const timestepSec = timestepMs / 1000
+    const timeCounter = Math.floor((now - startEpoch) / timestepSec)
     return hotp(secretKey, timeCounter, options)
+}
+
+export function testHotp() {
+    const correctResults = [
+        755224,
+        287082,
+        359152,
+        969429,
+        338314,
+        254676,
+        287922,
+        162583,
+        399871,
+        520489]
+
+    const key = triplesec.WordArray.from_utf8('12345678901234567890')
+
+    for(let i = 0; i < correctResults.length; i += 1) {
+        const result = hotp(key, i)
+        if(result !== correctResults[i]) {
+            throw new Error(`${i}: ${result} != ${correctResults[i]}`)
+        }
+    }
 }
