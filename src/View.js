@@ -40,6 +40,10 @@ class ViewModel {
         this.menuVisible = m.prop(false)
         this.totpMode = m.prop(mode === 'totp')
 
+        // The number of TOTP-bearing entries currently open. If this is zero,
+        // we don't need to redraw every refresh period.
+        this.totpVisible = m.prop(0)
+
         // Coalesce TOTP timers
         this.refreshIntervals = new Map()
 
@@ -65,14 +69,20 @@ class ViewModel {
         })
 
         // Start our TOTP interval timers
+        const redraw = () => {
+            if(this.totpVisible() > 0) {
+                console.log('Redrawing')
+                m.redraw()
+            }
+        }
+        this.redrawIntervalID = null
+
         for(let [t,v] of this.refreshIntervals) {
             v[0].totp.nextRefresh().then(() => {
-                console.log('Refresh!', v[0].totp.get())
-                m.redraw()
+                redraw()
 
-                self.setInterval(() => {
-                    m.redraw()
-                    console.log('Refresh!', v[0].totp.get())
+                this.redrawIntervalID = self.setInterval(() => {
+                    redraw()
                 }, t)
             })
         }
@@ -80,6 +90,11 @@ class ViewModel {
 
     show(entry) {
         const f = entry.isLocked()? entry.unlock : entry.lock
+
+        if(entry.haveTotp()) {
+            if(entry.isLocked()) { this.totpVisible(this.totpVisible() + 1) }
+            else { this.totpVisible(this.totpVisible() - 1) }
+        }
 
         m.startComputation()
         f.call(entry, SecureStorage.theSecureStorage.key).then(() => {
@@ -236,4 +251,8 @@ export const controller = function() {
     let mode = window.localStorage.getItem('viewMode')
     if(mode === null) { mode = 'password' }
     vm = new ViewModel(mode)
+
+    this.onunload = function() {
+        self.clearInterval(vm.redrawIntervalID)
+    }
 }
