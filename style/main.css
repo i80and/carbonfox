@@ -212,8 +212,6 @@ body .round-button {
     right: 0px;
     padding-right: 10px;
     padding-left: 10px;
-    border-top-left-radius: 20px;
-    border-bottom-left-radius: 20px;
     transition: background-color 0.25s ease, padding-right 0.25s ease;
 }
 
@@ -221,8 +219,6 @@ body .round-button {
     left: 0px;
     padding-left: 10px;
     padding-right: 10px;
-    border-top-right-radius: 20px;
-    border-bottom-right-radius: 20px;
     transition: background-color 0.25s ease, padding-left 0.25s ease;
 }
 
