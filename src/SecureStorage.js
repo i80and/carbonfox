@@ -52,17 +52,20 @@ export class TotpEntry {
         })
     }
 
-    // Returns a Promise that resolves when the next refresh interval passes
-    nextRefresh() {
-        // First decide how long to wait, based on even intervals
+    // Decide how long to wait, based on even intervals
+    msUntilNextRefresh() {
         const now = new Date().valueOf()
         const prev = Math.floor(now / this.timestep) * this.timestep
         const next = prev  + this.timestep
+        return next - now
+    }
 
+    // Returns a Promise that resolves when the next refresh interval passes
+    nextRefresh() {
         return new Promise((resolve) => {
             self.setTimeout(() => {
                 return resolve(this)
-            }, next - now)
+            }, this.msUntilNextRefresh())
         })
     }
 }

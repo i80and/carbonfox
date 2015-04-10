@@ -84,3 +84,12 @@ export function base32Decode(input) {
 
     return triplesec.WordArray.from_hex(output)
 }
+
+export function incrementer(start) {
+    let i = start
+    return () => {
+        const result = i
+        i += 1
+        return result
+    }
+}

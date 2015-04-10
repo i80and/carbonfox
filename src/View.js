@@ -1,4 +1,5 @@
 import * as SecureStorage from './SecureStorage.js'
+import * as util from './util.js'
 
 const _ = document.webL10n.get
 
@@ -21,12 +22,26 @@ class EntryViewModel {
     get totp() { return this.entry.totp }
     get comment() { return this.entry.comment }
 
-    getView() {
+    progressStyle() {
+        if(this.haveTotp()) {
+            return {
+                'animationDuration': ((this.totp.msUntilNextRefresh()) / 1000) + 's'
+            }
+        } else {
+            return {}
+        }
+    }
+
+    getView(key) {
         return m('div', [
             m('div', [
                 m('div', this.isLocked()? this.entry.domain : this.entry.password),
                     m('div', this.isLocked()? this.entry.username : ''),
-                    m('div.totp', this.isLocked()? '' : (this.entry.haveTotp()? this.entry.totp.get() : ''))
+                    m('div.totp', {
+                        style: this.progressStyle(),
+                        key: key
+                    },
+                    this.isLocked()? '' : (this.entry.haveTotp()? this.entry.totp.get() : '')),
                 ]),
                 m('div.lock-icon.fa', {class: this.isLocked()? 'fa-lock' : 'fa-unlock'}),
             ])
@@ -59,6 +74,10 @@ class ViewModel {
 
                 this.refreshIntervals.get(timestep).push(entry)
             }
+
+            if(!entry.isLocked()) {
+                this.totpVisible(this.totpVisible() + 1)
+            }
         }
 
         // Sort entries by domain
@@ -71,7 +90,6 @@ class ViewModel {
         // Start our TOTP interval timers
         const redraw = () => {
             if(this.totpVisible() > 0) {
-                console.log('Redrawing')
                 m.redraw()
             }
         }
@@ -195,6 +213,10 @@ export const view = function() {
             `letter-${entryIndex[entry._id]}`
     }
 
+    // To ensure that TOTP timeout animations restart properly, we give each
+    // virtual element a unique key.
+    const incrementer = util.incrementer(Math.random())
+
     return m('div#view', [
         m('div#title', [
             m('span', _('%view-title')),
@@ -216,7 +238,6 @@ export const view = function() {
                 return m('li', {
                     id: getIdForElement(entry),
                     style: vm.hidden()? {visibility: 'hidden'} : {},
-                    // class: (!entry.isLocked() && vm.mode() === 'totp')? 'expanded' : '',
                     onclick: () => {
                         vm.show(entry)
                     },
@@ -224,7 +245,7 @@ export const view = function() {
                         ev.preventDefault()
                         vm.edit(entry)
                     }}, [
-                    entry.getView()
+                    entry.getView(incrementer())
                 ])
             })),
 

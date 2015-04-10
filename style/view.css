@@ -110,4 +110,15 @@
 li .totp {
     text-align: right;
     font-size: 80%;
+
+    animation-name: totp-timeout;
+    animation-direction: normal;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+}
+
+@keyframes totp-timeout {
+    from { opacity: 1.0; }
+    75% { opacity: 1.0; }
+    to { opacity: 0.1; }
 }
