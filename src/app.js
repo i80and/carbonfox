@@ -29,8 +29,8 @@ document.addEventListener('localized', () => {
         '/welcome': Welcome,
         '/login': Login,
         '/view': View,
-        '/edit': Edit,
-        '/edit/:id': Edit,
+        '/edit/:mode': Edit,
+        '/edit/:mode/:id': Edit,
         '/changepin': ChangePIN,
         '/about': About
     })

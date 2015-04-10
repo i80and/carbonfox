@@ -5,19 +5,25 @@ import * as GeneratorDict from './GeneratorDict.js'
 let _ = document.webL10n.get
 
 class ViewModel {
-    constructor(id) {
-        this.editingEntry = null
-
+    constructor(mode, id) {
+        this.mode = m.prop(mode)
         this.domain = m.prop('')
         this.username = m.prop('')
         this.password = m.prop('')
 
+        this.secret = m.prop('')
+
         if(id !== undefined) {
-            this.editingEntry = SecureStorage.theSecureStorage.cache.get(id)
-            if(this.editingEntry !== undefined) {
-                this.domain(this.editingEntry.domain)
-                this.username(this.editingEntry.username)
-            }
+            this.editingEntry = SecureStorage.theSecureStorage.cache.get(id).clone()
+        } else {
+            this.editingEntry = new SecureStorage.SecureEntry({})
+        }
+
+        this.domain(this.editingEntry.domain)
+        this.username(this.editingEntry.username)
+
+        if(this.editingEntry.haveTotp()) {
+            this.secret(this.editingEntry.totp.secret)
         }
     }
 
@@ -37,10 +43,6 @@ class ViewModel {
         })
     }
 
-    cancel() {
-        m.route('/view')
-    }
-
     delete() {
         if(this.editingEntry === null) {
             return
@@ -49,7 +51,7 @@ class ViewModel {
         if(window.confirm('Are you sure you want to delete this password?')) {
             SecureStorage.theSecureStorage.delete(this.editingEntry).then(() => {
                 Floater.message(_('%deleted'))
-                m.route('/view')
+                history.back()
             }, (err) => {
                 console.error(err)
                 Floater.message(_('%error-deleting'))
@@ -58,31 +60,23 @@ class ViewModel {
     }
 
     save() {
-        const makeEntry = () => {
-            let _id
-            let _rev
+        if(this.domain() === '' || this.username() === '') { return }
 
-            if(this.editingEntry !== null) {
-                _id = this.editingEntry._id
-                _rev = this.editingEntry._rev
+        this.editingEntry.domain = this.domain()
+        this.editingEntry.username = this.username()
+        this.editingEntry.password = this.password()
+
+        if(this.mode() === 'totp' && this.secret()) {
+            if(!this.editingEntry.haveTotp()) {
+                this.editingEntry.totp = new SecureStorage.TotpEntry(this.secret())
+            } else {
+                this.editingEntry.totp.secret = this.secret()
             }
-
-            return new SecureStorage.SecureEntry({
-                _id: _id,
-                _rev: _rev,
-                domain: this.domain(),
-                username: this.username(),
-                password: this.password()
-            })
         }
 
-        if(this.domain() === '' || this.username() === '' || this.password() === '') { return }
-
-        const entry = makeEntry()
-
-        SecureStorage.theSecureStorage.save(entry).then(() => {
+        SecureStorage.theSecureStorage.save(this.editingEntry).then(() => {
             Floater.message(_('%saved'))
-            m.route('/view')
+            history.back()
         }).catch((err) => {
             console.error(err)
             if(err.name === 'conflict') {
@@ -99,7 +93,7 @@ let vm = null
 export const view = function() {
     return m('div#view', [
         m('div#title', [
-            m('span.fa.fa-chevron-left.title-button.left', {onclick: () => vm.cancel()}),
+            m('span.fa.fa-chevron-left.title-button.left', {onclick: () => history.back()}),
             m('span', _('%edit-title')),
             m('span.fa.fa-check.title-button.right', {onclick: () => vm.save()}),
         ]),
@@ -111,14 +105,30 @@ export const view = function() {
                 placeholder: _('%placeholder-username'),
                 onchange: m.withAttr('value', vm.username),
                 value: vm.username()}),
+            m('div.vspacer'),
+
+            m('h2', 'Password'),
             m('textarea', {
                 rows: 3,
                 wrap: 'hard',
                 placeholder: _('%placeholder-password'),
                 onchange: m.withAttr('value', vm.password),
                 value: vm.password()}),
-            m('div.vspacer'),
             m('button', {onclick: () => vm.generate()}, _('%generate')),
+            m('div.vspacer'),
+
+            m('div', {
+                style: {display: (vm.mode() === 'totp')? 'block' : 'none'}
+            }, [
+                m('h2', 'Time-Based Authentication'),
+                m('input', {
+                    type: 'input',
+                    placeholder: 'secret',
+                    onchange: m.withAttr('value', vm.secret),
+                }),
+                m('button', 'QR Code')
+            ]),
+            m('div.vspacer'),
             (vm.editingEntry === null)?
                 null
                 : m('button.danger', {
@@ -128,5 +138,5 @@ export const view = function() {
 }
 
 export const controller = function() {
-    vm = new ViewModel(m.route.param('id'))
+    vm = new ViewModel(m.route.param('mode'), m.route.param('id'))
 }

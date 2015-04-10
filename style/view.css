@@ -7,19 +7,25 @@
 #entry-list {
     padding-left: 0px;
     margin-top: 0px;
+    overflow: hidden;
 }
 
 #entry-list > li {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     cursor: pointer;
     width: calc(100% - 4.0rem);
     height: 6rem;
     margin-top: 0px;
     margin-left: 3.0rem;
+    padding: 0.5rem;
     padding-left: 1rem;
 
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, height 0.2s ease;
+}
+
+#entry-list > li.expanded {
+    height: 8rem;
 }
 
 #entry-list > li > div {
@@ -102,4 +108,9 @@
     #search-bar {
         visibility: hidden;
     }
+}
+
+li .totp {
+    text-align: right;
+    font-size: 80%;
 }

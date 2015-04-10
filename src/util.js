@@ -38,3 +38,49 @@ export function* map(it, f) {
         yield f(x)
     }
 }
+
+// XXX This function is a mess
+export function base32Decode(input) {
+    const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
+
+    let bits = 0
+    let curByte = 0
+    let curWord = 0
+    let wordOffset = 0
+    let result = []
+
+    for(let i = 0; i < input.length; i += 1) {
+        // Ignore tail padding
+        if(input[i] === '=') {
+            break
+        }
+
+        let x = ALPHABET.indexOf(input[i])
+        if(x < 0) {
+            throw new Error('Invalid base32')
+        }
+
+        x <<= 3
+        curByte |= x >>> bits
+        bits += 5
+        if(bits >= 8) {
+            curWord |= curByte << 8
+            wordOffset += 1
+            result.push(curByte)
+            bits -= 8
+            if(bits > 0) {
+                curByte = x << (5 - bits) & 255
+            } else {
+                curByte = 0
+            }
+        }
+    }
+
+    // Convert into a hex string
+    let output = ''
+    for(let i = 0; i < result.length; i += 1) {
+        output += result[i].toString(16)
+    }
+
+    return triplesec.WordArray.from_hex(output)
+}

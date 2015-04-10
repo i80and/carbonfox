@@ -1,24 +1,78 @@
 import * as SecureStorage from './SecureStorage.js'
 
-let _ = document.webL10n.get
+const _ = document.webL10n.get
+
+class EntryViewModel {
+    constructor(entry) {
+        this.entry = entry
+    }
+
+    isLocked() { return this.entry.isLocked() }
+    unlock(key) { return this.entry.unlock(key) }
+    lock(key) { return this.entry.lock(key) }
+    haveTotp() { return this.entry.haveTotp() }
+    get _id() { return this.entry._id }
+    get _rev() { return this.entry._rev }
+    get domain() { return this.entry.domain }
+    get username() { return this.entry.username }
+    get password() { return this.entry.password }
+    get cipherPassword() { return this.entry.cipherPassword }
+    get salt() { return this.entry.salt }
+    get totp() { return this.entry.totp }
+    get comment() { return this.entry.comment }
+
+    getView() {
+        return m('div', [
+            m('div', [
+                m('div', this.isLocked()? this.entry.domain : this.entry.password),
+                    m('div', this.isLocked()? this.entry.username : ''),
+                    m('div.totp', this.isLocked()? '' : (this.entry.haveTotp()? this.entry.totp.get() : ''))
+                ]),
+                m('div.lock-icon.fa', {class: this.isLocked()? 'fa-lock' : 'fa-unlock'}),
+            ])
+    }
+}
 
 class ViewModel {
-    constructor() {
-        this.hidden = false
+    constructor(mode) {
+        this.hidden = m.prop(false)
         this.entries = []
         this.menuVisible = m.prop(false)
-        this.totpMode = m.prop(false)
+        this.totpMode = m.prop(mode === 'totp')
+
+        // Coalesce TOTP timers
+        this.refreshIntervals = new Map()
 
         for(let kv of SecureStorage.theSecureStorage.iterate()) {
-            const entry = kv[0]
+            const entry = new EntryViewModel(kv[0])
             this.entries.push(entry)
+
+            if(entry.haveTotp()) {
+                const timestep = entry.totp.timestep
+                if(!this.refreshIntervals.has(timestep)) {
+                    this.refreshIntervals.set(timestep, [])
+                }
+
+                this.refreshIntervals.get(timestep).push(entry)
+            }
         }
 
+        // Sort entries by domain
         this.entries.sort((a,b) => {
-            if(a.domain > b.domain) { return 1 }
-            if(a.domain < b.domain) { return -1 }
+            if(a.entry.domain > b.entry.domain) { return 1 }
+            if(a.entry.domain < b.entry.domain) { return -1 }
             return 0
         })
+
+        // Start our TOTP interval timers
+        for(let [t,v] of this.refreshIntervals) {
+            v[0].totp.nextRefresh().then(() => {
+                // XXX
+                self.setInterval(() => {
+                    // XXX
+                }, t)
+            })
+        }
     }
 
     show(entry) {
@@ -33,12 +87,16 @@ class ViewModel {
         })
     }
 
+    mode() {
+        return this.totpMode()? 'totp' : 'password'
+    }
+
     add() {
-        m.route('/edit')
+        m.route(`/edit/${this.mode()}`)
     }
 
     edit(entry) {
-        m.route(`/edit/${entry._id}`)
+        m.route(`/edit/${this.mode()}/${entry._id}`)
     }
 
     // Scroll the view such that domains starting with a given letter are visible
@@ -81,6 +139,7 @@ class ViewModel {
 
     toggleTotp() {
         this.totpMode(!this.totpMode())
+        window.localStorage.setItem('viewMode', this.mode())
         this.menuVisible(false)
     }
 }
@@ -91,7 +150,7 @@ document.addEventListener('visibilitychange', () => {
     if(vm === null) { return }
 
     m.startComputation()
-    vm.hidden = document.hidden
+    vm.hidden(document.hidden)
     m.endComputation()
 })
 
@@ -135,24 +194,19 @@ export const view = function() {
                 }))
             ]),
 
-            m('ul#entry-list', vm.entries.filter((entry) => {
-                return entry.haveTotp() === vm.totpMode()
-            }).map((entry) => {
+            m('ul#entry-list', vm.entries.map((entry) => {
                 return m('li', {
                     id: getIdForElement(entry),
-                    style: vm.hidden? {visibility: 'hidden'} : {},
-                    onclick: () => vm.show(entry),
+                    style: vm.hidden()? {visibility: 'hidden'} : {},
+                    // class: (!entry.isLocked() && vm.mode() === 'totp')? 'expanded' : '',
+                    onclick: () => {
+                        vm.show(entry)
+                    },
                     oncontextmenu: (ev) => {
                         ev.preventDefault()
                         vm.edit(entry)
                     }}, [
-                    m('div', [
-                        m('div', [
-                            m('div', entry.isLocked()? entry.domain : entry.password),
-                            m('div', entry.isLocked()? entry.username : ''),
-                        ]),
-                        m('div.lock-icon.fa', {class: entry.isLocked()? 'fa-lock' : 'fa-unlock'}),
-                    ])
+                    entry.getView()
                 ])
             })),
 
@@ -176,5 +230,7 @@ export const view = function() {
 }
 
 export const controller = function() {
-    vm = new ViewModel()
+    let mode = window.localStorage.getItem('viewMode')
+    if(mode === null) { mode = 'password' }
+    vm = new ViewModel(mode)
 }

@@ -14,7 +14,6 @@ export const view = function() {
             m('div.vspacer'),
             m('a.bb-button.recommend', {
                 onclick: () => {
-                    console.log('back')
                     history.back()
                 }
             }, _('%back'))

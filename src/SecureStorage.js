@@ -44,7 +44,9 @@ export class TotpEntry {
     }
 
     get() {
-        return Totp.totp(this.secret, 0, new Date(), this.timestep, {
+        if(!this.secret) { return }
+
+        return Totp.totp(util.base32Decode(this.secret), 0, new Date(), this.timestep, {
             hash: this.hash,
             digits: this.digits
         })
@@ -65,15 +67,15 @@ export class TotpEntry {
     }
 }
 
-// A single password database entry. The password field is kept encrypted
+// A single password database entry. The password field remains encrypted
 // even after a SecureEntry is returned.
 export class SecureEntry {
     constructor(options) {
-        this.domain = options.domain
-        this.username = options.username
+        this.domain = options.domain || ''
+        this.username = options.username || ''
         this.password = options.password || null
         this.cipherPassword = options.cipherPassword || null
-        this.salt = options.salt || null
+        this.salt = options.salt || ''
         this.comment = options.comment || ''
 
         this.totp = (options.totp)? TotpEntry.fromDocument(options.totp) : null
@@ -138,6 +140,12 @@ export class SecureEntry {
 
     haveTotp() {
         return this.totp !== null
+    }
+
+    clone() {
+        const copy = SecureEntry.fromDocument(this)
+        copy.cipherPassword = null
+        return copy
     }
 }
 
