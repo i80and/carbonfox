@@ -111,9 +111,13 @@ export const view = function() {
         m('section#add-password-pane', [
             m('input[type="text"]', {
                 placeholder: _('%placeholder-website'),
+                spellcheck: false,
+                autocomplete: false,
                 onchange: m.withAttr('value', vm.domain), value: vm.domain()}),
             m('input[type="text"]', {
                 placeholder: _('%placeholder-username'),
+                spellcheck: false,
+                autocomplete: false,
                 onchange: m.withAttr('value', vm.username),
                 value: vm.username()}),
             m('div.vspacer'),
@@ -123,6 +127,8 @@ export const view = function() {
                 rows: 3,
                 wrap: 'hard',
                 placeholder: _('%placeholder-password'),
+                spellcheck: false,
+                autocomplete: false,
                 onchange: m.withAttr('value', vm.password),
                 value: vm.password()}),
             m('button', {onclick: () => vm.generate()}, _('%generate')),
@@ -135,6 +141,8 @@ export const view = function() {
                 m('input', {
                     type: 'input',
                     placeholder: 'secret',
+                    spellcheck: false,
+                    autocomplete: false,
                     onchange: m.withAttr('value', vm.secret),
                 }),
                 m('button', 'QR Code')
