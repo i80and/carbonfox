@@ -24,8 +24,10 @@ class EntryViewModel {
 
     progressStyle() {
         if(this.haveTotp()) {
+            const delay = -((this.totp.timestep - this.totp.msUntilNextRefresh()) / 1000)
             return {
-                'animationDuration': ((this.totp.msUntilNextRefresh()) / 1000) + 's'
+                'animationDuration': (this.totp.timestep / 1000) + 's',
+                'animationDelay': delay + 's'
             }
         } else {
             return {}
