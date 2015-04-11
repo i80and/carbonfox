@@ -12,6 +12,9 @@ class ViewModel {
         this.password = m.prop('')
 
         this.secret = m.prop('')
+        this.digits = m.prop(6)
+        this.intervalSeconds = m.prop(30)
+        this.hash = m.prop('sha1')
 
         if(id !== undefined) {
             this.editingEntry = SecureStorage.theSecureStorage.cache.get(id).clone()
@@ -68,9 +71,17 @@ class ViewModel {
 
         if(this.mode() === 'totp' && this.secret()) {
             if(!this.editingEntry.haveTotp()) {
-                this.editingEntry.totp = new SecureStorage.TotpEntry(this.secret())
+                this.editingEntry.totp = new SecureStorage.TotpEntry({
+                    secret: this.secret(),
+                    digits: this.digits(),
+                    timestep: this.intervalSeconds() * 1000,
+                    hash: this.hash()
+                })
             } else {
                 this.editingEntry.totp.secret = this.secret()
+                this.editingEntry.totp.digits = this.digits()
+                this.editingEntry.totp.timestep = this.intervalSeconds() * 1000
+                this.editingEntry.totp.hash = this.hash()
             }
         }
 
