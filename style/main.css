@@ -209,6 +209,7 @@ body .round-button {
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     height: 45px;
+    width: 39px;
     background-color: lightgray;
     cursor: pointer;
 }
