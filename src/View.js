@@ -4,6 +4,10 @@ let _ = document.webL10n.get
 
 class ViewModel {
     constructor() {
+        if(SecureStorage.theSecureStorage.key === null) {
+            return m.route('/login')
+        }
+
         this.hidden = false
         this.entries = []
         this.menuVisible = m.prop(false)

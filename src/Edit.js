@@ -6,6 +6,10 @@ let _ = document.webL10n.get
 
 class ViewModel {
     constructor(id) {
+        if(SecureStorage.theSecureStorage.key === null) {
+            return m.route('/login')
+        }
+
         this.editingEntry = null
 
         this.domain = m.prop('')
