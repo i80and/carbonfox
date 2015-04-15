@@ -10,6 +10,13 @@ class ViewModel {
 
         for(let kv of SecureStorage.theSecureStorage.iterate()) {
             const entry = kv[0]
+
+            // Skip invalid entries
+            if(entry.domain === undefined) {
+                console.error(`Invalid: ${entry._id}`)
+                continue
+            }
+
             this.entries.push(entry)
         }
 

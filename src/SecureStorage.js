@@ -42,6 +42,11 @@ export class SecureEntry {
 
         this._id = options._id || undefined
         this._rev = options._rev || undefined
+
+        if(this.domain === undefined ||
+            this.username === undefined) {
+            throw util.error('ValueError', 'Bad SecureEntry', this)
+        }
     }
 
     static fromDocument(doc) {
