@@ -21,6 +21,12 @@ class ViewModel {
             if(this.editingEntry !== undefined) {
                 this.domain(this.editingEntry.domain)
                 this.username(this.editingEntry.username)
+
+                m.startComputation()
+                this.editingEntry.unlock(SecureStorage.theSecureStorage.key).then(() => {
+                    this.password(this.editingEntry.password)
+                    m.endComputation()
+                })
             }
         }
     }
@@ -42,7 +48,7 @@ class ViewModel {
     }
 
     cancel() {
-        m.route('/view')
+        this.exit()
     }
 
     delete() {
@@ -53,7 +59,7 @@ class ViewModel {
         if(window.confirm('Are you sure you want to delete this password?')) {
             SecureStorage.theSecureStorage.delete(this.editingEntry).then(() => {
                 Floater.message(_('%deleted'))
-                m.route('/view')
+                this.exit()
             }, (err) => {
                 console.error(err)
                 Floater.message(_('%error-deleting'))
@@ -86,7 +92,7 @@ class ViewModel {
 
         SecureStorage.theSecureStorage.save(entry).then(() => {
             Floater.message(_('%saved'))
-            m.route('/view')
+            this.exit()
         }).catch((err) => {
             console.error(err)
             if(err.name === 'conflict') {
@@ -95,6 +101,15 @@ class ViewModel {
                 Floater.message(`${_('%error')}: ${err.name}`)
             }
         })
+    }
+
+    exit() {
+        const f = () => m.route('/view')
+        if(this.editingEntry) {
+            return SecureStorage.theSecureStorage.lockEntry(this.editingEntry).then(f).catch(f)
+        }
+
+        return f()
     }
 }
 

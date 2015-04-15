@@ -23,8 +23,8 @@ class ViewModel extends Login.ViewModel {
         const newDB = new SecureStorage.SecureStorage(newDBName)
         let waiting = []
         newDB.unlock(this.pinList.join('')).then(() => {
-            for(let [,unlock] of SecureStorage.theSecureStorage.iterate()) {
-                waiting.push(unlock().then((unlocked) => {
+            for(let entry of SecureStorage.theSecureStorage.iterate()) {
+                waiting.push(SecureStorage.theSecureStorage.unlockEntry(entry).then((unlocked) => {
                     return newDB.save(unlocked)
                 }))
             }

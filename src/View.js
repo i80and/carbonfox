@@ -12,9 +12,7 @@ class ViewModel {
         this.entries = []
         this.menuVisible = m.prop(false)
 
-        for(let kv of SecureStorage.theSecureStorage.iterate()) {
-            const entry = kv[0]
-
+        for(let entry of SecureStorage.theSecureStorage.iterate()) {
             // Skip invalid entries
             if(entry.domain === undefined) {
                 console.error(`Invalid: ${entry._id}`)

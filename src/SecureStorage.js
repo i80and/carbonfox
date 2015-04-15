@@ -213,13 +213,18 @@ export class SecureStorage {
         })
     }
 
-    // Returns an iterator yielding (entry, f) pairs, where f returns a Promise
-    // that will unlock entry. This should be a proper ES6 iterator, but that
-    // requires Symbol.
+    // Returns an iterator yielding each entry in the cache. This should be a
+    // proper ES6 iterator, but that requires Symbol.
     iterate() {
-        return util.map(this.cache.values(), (entry) => {
-            return [entry, () => entry.unlock(this.key)]
-        })
+        return this.cache.values()
+    }
+
+    lockEntry(entry) {
+        return entry.lock(this.key)
+    }
+
+    unlockEntry(entry) {
+        return entry.unlock(this.key)
     }
 
     delete(entry) {
