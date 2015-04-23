@@ -17,11 +17,11 @@ export function generateRandom(nBytes) {
     return result
 }
 
-export function scrypt(password, salt, m) {
+export function scrypt(password, salt, timeFactor, memoryFactor) {
     if(m === undefined) { m = 16 }
 
     let worker = new Worker('js/crypto_worker.min.js')
-    worker.postMessage({method: 'scrypt', args: [password, salt, m]})
+    worker.postMessage({method: 'scrypt', args: [password, salt, timeFactor, memoryFactor]})
 
     return new Promise((resolve, reject) => {
         worker.onmessage = (msg) => {

@@ -1,7 +1,12 @@
 import * as util from './util.js'
 import * as CryptoTools from './CryptoTools.js'
 
+// scrypt parameters. The memory factor is a lot lower than I'd like, but even
+// r=6 is pushing the limits of my test device. However, according to
+// http://blog.ircmaxell.com/2014/03/why-i-dont-recommend-scrypt.html
+// r=4 is the minimum for surpassing bcrypt's security, so this should be Good Enough.
 export const timeFactor = 16
+export const memoryFactor = 6
 
 // A semi-random ID generator that creates extents of strictly increasing
 // values. Designed to create well-balanced and efficient CouchDB B-Trees.
@@ -166,7 +171,7 @@ export class SecureStorage {
             masterKey = triplesec.WordArray.from_hex(storedMasterKey)
         }
 
-        return CryptoTools.scrypt(pin, storedSalt, 16).then((key) => {
+        return CryptoTools.scrypt(pin, storedSalt, timeFactor, memoryFactor).then((key) => {
             // XXX I am led to believe that it is safe to use SHA256(k1 .. k2)
             // as a KDF, so long as k1 and k2 are of the same length. But
             // somebody should check this.

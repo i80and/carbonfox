@@ -5,10 +5,10 @@
 
 importScripts('triplesec.js')
 
-var scrypt = function(pin, salt, time_factor) {
+var scrypt = function(pin, salt, time_factor, memory_factor) {
     var pinWordArray = triplesec.WordArray.from_utf8(pin)
     var saltWordArray = triplesec.WordArray.from_hex(salt)
-    triplesec.scrypt({key: pinWordArray, salt: saltWordArray, dkLen: 32, r: 16, N: time_factor}, (key) => {
+    triplesec.scrypt({key: pinWordArray, salt: saltWordArray, dkLen: 32, r: memory_factor, N: time_factor}, (key) => {
         pinWordArray.scrub()
         self.postMessage({'result': key.to_ui8a()})
         key.scrub()
