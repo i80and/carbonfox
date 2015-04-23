@@ -100,3 +100,9 @@
 
     transition: box-shadow 0.2s ease, transform 0.2s ease, background-color 0.4s ease;
 }
+
+@media (max-height: 320px) {
+    #keypad section a div:nth-child(2) {
+        display: none;
+    }
+}
