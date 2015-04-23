@@ -1,5 +1,12 @@
 import * as util from './util.js'
 
+// Scrypt parameters. The parameters described by [Percival, 2009] were
+// N=14, r=8, p=1.  Increasing the block size to r=16 causes this to require
+// 128 * 16 * (2^14) = 33,554,432 bytes, which helps offset the lack of power
+// on mobile devices.
+export const timeFactor = 14
+export const memoryFactor = 16
+
 // Box format, in 4-byte words
 // 6    N         16
 // [IV] [Message] [Signature]
@@ -18,8 +25,6 @@ export function generateRandom(nBytes) {
 }
 
 export function scrypt(password, salt, timeFactor, memoryFactor) {
-    if(m === undefined) { m = 16 }
-
     let worker = new Worker('js/crypto_worker.min.js')
     worker.postMessage({method: 'scrypt', args: [password, salt, timeFactor, memoryFactor]})
 
@@ -47,6 +52,33 @@ export function pbkdf2(input, salt, iters) {
             ourInput.scrub()
             return resolve(result)
         })
+    })
+}
+
+export function createSalt() {
+    let rawSalt = generateRandom(saltSize * 4).to_hex()
+    return JSON.stringify({
+        type: 'scrypt',
+        salt: rawSalt,
+        N: timeFactor,
+        r: memoryFactor
+    })
+}
+
+// Pluggable KDF that yields a 256-derived key. The salt, if specified, must be
+// a JSON object containing at least "type" and a 128-bit hex "salt" string.
+export function kdf(input, salt) {
+    return new Promise((resolve, reject) => {
+        try {
+            let parsed = JSON.parse(salt)
+            if(parsed.type === 'scrypt') {
+                return resolve(scrypt(input, parsed.salt, parsed.N, parsed.r))
+            }
+
+            return reject(util.error('ValueError', 'Bad salt type'))
+        } catch(err) {
+            return reject(err)
+        }
     })
 }
 
