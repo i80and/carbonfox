@@ -6,6 +6,7 @@ html {
 body {
     margin: 0px;
     height: 100%;
+    background-color: #343434;
     background-image: url('/style/images/footer_lodyas/footer_lodyas.png');
 }
 
